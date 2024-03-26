@@ -1,0 +1,37 @@
+{
+  "name": "Area",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "area",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "area",
+      "relationshipName": "product"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "profile",
+      "otherEntityRelationshipName": "area",
+      "relationshipName": "profile"
+    }
+  ],
+  "entityTableName": "area",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011948"
+}

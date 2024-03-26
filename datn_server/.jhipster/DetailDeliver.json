@@ -1,0 +1,42 @@
+{
+  "name": "DetailDeliver",
+  "fields": [
+    {
+      "fieldName": "price",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "unit",
+      "fieldType": "Unit",
+      "fieldValues": "TAN,KG,CHIEC,KHOI,HOP,BO"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "deliver",
+      "otherEntityRelationshipName": "detailDeliver",
+      "relationshipName": "deliver"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "detailDeliver",
+      "relationshipName": "product"
+    }
+  ],
+  "entityTableName": "detail_deliver",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011956"
+}

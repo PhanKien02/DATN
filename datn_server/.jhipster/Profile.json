@@ -1,0 +1,74 @@
+{
+  "name": "Profile",
+  "fields": [
+    {
+      "fieldName": "fullName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "phone",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "gender",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "dob",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "avatar",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "user",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "taskProfile",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "taskProfile"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "deliver",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "deliver"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "receive",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "receive"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "ward",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "ward"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "area",
+      "otherEntityRelationshipName": "profile",
+      "relationshipName": "area"
+    }
+  ],
+  "entityTableName": "profile",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011951"
+}

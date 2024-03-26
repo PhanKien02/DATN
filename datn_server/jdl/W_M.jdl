@@ -1,0 +1,105 @@
+entity Province{
+    name String
+}
+
+entity Ward{
+    name String
+}
+entity District {
+	name String
+}
+entity Area {
+name String
+area Double
+}
+entity Product {
+name String
+amount Integer
+status Boolean
+}
+entity TypeProduct {
+name String
+description String
+}
+
+entity Profile{
+	fullName String
+    phone String
+    gender Boolean
+    dob ZonedDateTime
+    avatar String
+
+}
+entity TaskProfile {
+	dates ZonedDateTime
+}
+entity Task {
+	title String
+    description String
+}
+entity Receive {
+	dates ZonedDateTime
+	status Boolean
+    delivererName String
+}
+entity Deliver {
+	dates ZonedDateTime
+    status Boolean
+}
+entity DetailDeliver{
+price Double
+amount Integer
+unit Unit
+}
+entity DetailReceive {
+	price Double
+    amount Integer
+    unit Unit
+}
+entity Notifications {
+title String
+content String
+
+}
+enum Unit{
+	TAN
+    KG
+    CHIEC
+    KHOI
+    HOP
+    BO
+}
+
+relationship OneToOne {
+	Profile{user} to User
+}
+
+relationship OneToMany {
+	Ward to Profile
+    Province to District
+    District to Ward
+    Task to TaskProfile
+    Profile to TaskProfile
+    Area to Product
+    Area to Profile
+    TypeProduct to Product
+    Task to TaskProfile
+    Profile to Deliver
+    Profile to  Receive
+    Deliver to DetailDeliver
+    Product to DetailDeliver
+    Receive to DetailReceive
+    Product to DetailReceive
+}
+
+// Set pagination options
+paginate * with pagination
+
+// Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl
+
+
+

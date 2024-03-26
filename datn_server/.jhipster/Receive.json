@@ -1,0 +1,41 @@
+{
+  "name": "Receive",
+  "fields": [
+    {
+      "fieldName": "dates",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "delivererName",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "detailReceive",
+      "otherEntityRelationshipName": "receive",
+      "relationshipName": "detailReceive"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "profile",
+      "otherEntityRelationshipName": "receive",
+      "relationshipName": "profile"
+    }
+  ],
+  "entityTableName": "receive",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011954"
+}

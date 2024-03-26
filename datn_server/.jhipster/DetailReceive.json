@@ -1,0 +1,42 @@
+{
+  "name": "DetailReceive",
+  "fields": [
+    {
+      "fieldName": "price",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "unit",
+      "fieldType": "Unit",
+      "fieldValues": "TAN,KG,CHIEC,KHOI,HOP,BO"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "receive",
+      "otherEntityRelationshipName": "detailReceive",
+      "relationshipName": "receive"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "detailReceive",
+      "relationshipName": "product"
+    }
+  ],
+  "entityTableName": "detail_receive",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011957"
+}

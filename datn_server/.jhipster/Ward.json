@@ -1,0 +1,33 @@
+{
+  "name": "Ward",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "profile",
+      "otherEntityRelationshipName": "ward",
+      "relationshipName": "profile"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "district",
+      "otherEntityRelationshipName": "ward",
+      "relationshipName": "district"
+    }
+  ],
+  "entityTableName": "ward",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011946"
+}

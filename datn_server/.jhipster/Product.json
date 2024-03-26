@@ -1,0 +1,53 @@
+{
+  "name": "Product",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Boolean"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "detailDeliver",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "detailDeliver"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "detailReceive",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "detailReceive"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "area",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "area"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "typeProduct",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "typeProduct"
+    }
+  ],
+  "entityTableName": "product",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011949"
+}

@@ -1,0 +1,33 @@
+{
+  "name": "TaskProfile",
+  "fields": [
+    {
+      "fieldName": "dates",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "task",
+      "otherEntityRelationshipName": "taskProfile",
+      "relationshipName": "task"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "profile",
+      "otherEntityRelationshipName": "taskProfile",
+      "relationshipName": "profile"
+    }
+  ],
+  "entityTableName": "task_profile",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20240317011952"
+}
