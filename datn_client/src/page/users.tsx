@@ -157,7 +157,7 @@ const UserManagerPage = () => {
                               ghost
                               className={`${
                                    record.activated
-                                        ? "!bg-yellow-400"
+                                        ? "!bg-red-600"
                                         : "!bg-green-600"
                               } text-white flex items-center gap-2 text-xl justify-center`}
                               onClick={() => {
