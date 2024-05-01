@@ -1,14 +1,15 @@
 import { Button, Modal } from "antd";
 import { useState } from "react";
 import { IPromotion } from "../models/promotion";
+import PromotionForm from "../forms/promotionForm";
 
 interface Props {
      title?: string;
-     icon: JSX.Element;
+     icon?: JSX.Element;
      data?: IPromotion;
      refetch: () => void;
 }
-const UserModal = ({ title, icon, refetch, data }: Props) => {
+const PromotionModal = ({ title, icon, refetch, data }: Props) => {
      const [open, setOpen] = useState(false);
      const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -41,22 +42,22 @@ const UserModal = ({ title, icon, refetch, data }: Props) => {
                     <span className="mt-1">{icon}</span>
                </Button>
                <Modal
-                    title={title || "Update User"}
+                    title={title || "Cập Nhật Thông Tin Chương Trình"}
                     open={open}
                     onOk={handleOk}
                     confirmLoading={confirmLoading}
                     onCancel={handleCancel}
                     footer={null}
-                    width={700}
+                    width={800}
                >
-                    {/* <UserForm
+                    <PromotionForm
                          setOpen={setOpen}
                          refetch={refetch}
-                         userData={userData}
-                    /> */}
+                         data={data}
+                    />
                </Modal>
           </>
      );
 };
 
-export default UserModal;
+export default PromotionModal;

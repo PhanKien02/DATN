@@ -7,5 +7,11 @@ export interface IPromotion {
 
      percent: number;
 
+     startDate: string;
+
      expDate: string;
+
+     conditionPrice: number;
+
+     status: boolean;
 }

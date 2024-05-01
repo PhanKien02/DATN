@@ -7,5 +7,7 @@ export interface IPromotion {
 
     percent: number;
 
-    expDate: number;
+    startDate: Date;
+
+    expDate: Date;
 }

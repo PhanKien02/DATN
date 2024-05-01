@@ -30,7 +30,10 @@ export default class Promotion extends Model {
     percent: number;
 
     @Column({ type: DataType.DATE })
-    expDate: number;
+    startDate: Date;
+
+    @Column({ type: DataType.DATE })
+    expDate: Date;
 
     @Column({ type: DataType.INTEGER })
     conditionPrice: number;
