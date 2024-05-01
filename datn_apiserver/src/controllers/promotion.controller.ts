@@ -11,3 +11,27 @@ export const getALlPromotion = async (
     const result = await promotionService.getAllPromotion();
     return res.status(httpStatus.OK).send(result);
 };
+
+export const savePromotion = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const promotion = req.body;
+    const user = req.user;
+    const result = promotionService.savePromotion(user, promotion);
+    res.status(httpStatus.OK).send(result);
+};
+export const blockOrActivePromotion = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const promotionId = req.query.promotionId;
+    const status = req.query.status;
+    const user = req.user;
+    const result = promotionService.blockOrActivePromotion(
+        user,
+        +promotionId,
+        status == "true" ? true : false
+    );
+    res.status(httpStatus.OK).send(result);
+};

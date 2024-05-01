@@ -23,7 +23,7 @@ const routers: RouteObject[] = [
                     Component: UserManagerPage,
                },
                {
-                    path: "/giam-gia",
+                    path: "/khuyen-mai",
                     id: "promotion",
                     Component: PromotionManagerPage,
                },

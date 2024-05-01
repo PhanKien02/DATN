@@ -86,7 +86,7 @@ const MainLayout = () => {
                </Sider>
                <Layout className="sticky bottom-0 right-0">
                     <Header
-                         className="site-layout-sub-header-background !h-20 sticky top-0 z-10 !bg-yellow-300 border-solid border-[#915959] border-b-2 "
+                         className="site-layout-sub-header-background !h-20 sticky top-0 z-10 !bg-[yellow] border-solid border-[#915959] border-b-2 "
                          style={{ padding: 0 }}
                     >
                          <HeaderComponent />

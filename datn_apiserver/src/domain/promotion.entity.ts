@@ -1,13 +1,17 @@
 import {
     AutoIncrement,
     Column,
+    CreatedAt,
     DataType,
+    ForeignKey,
     HasMany,
     Model,
     PrimaryKey,
     Table,
+    UpdatedAt,
 } from "sequelize-typescript";
 import Booking from "./booking.entity";
+import User from "./user.entity";
 
 @Table
 export default class Promotion extends Model {
@@ -26,11 +30,33 @@ export default class Promotion extends Model {
     percent: number;
 
     @Column({ type: DataType.DATE })
-    expDate: number;
+    startDate: Date;
+
+    @Column({ type: DataType.DATE })
+    expDate: Date;
 
     @Column({ type: DataType.INTEGER })
     conditionPrice: number;
 
+    @Column({ type: DataType.BOOLEAN })
+    status: boolean;
+
     @HasMany(() => Booking)
     booking: Booking[];
+
+    @Column
+    @ForeignKey(() => User)
+    createdBy?: number;
+
+    @Column
+    @ForeignKey(() => User)
+    updatedBy?: number;
+
+    @CreatedAt
+    @Column
+    createdAt?: Date;
+
+    @UpdatedAt
+    @Column
+    updatedAt?: Date;
 }

@@ -42,7 +42,7 @@ const UserModal = ({ title, icon, refetch, userData }: Props) => {
                     <span className="mt-1">{icon}</span>
                </Button>
                <Modal
-                    title={title || "Update User"}
+                    title={title || "Cập Nhật Thông Tin Nhân Viên"}
                     open={open}
                     onOk={handleOk}
                     confirmLoading={confirmLoading}

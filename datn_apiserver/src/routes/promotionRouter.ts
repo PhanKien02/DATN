@@ -1,7 +1,11 @@
 import { BaseRouter } from "./BaseRouter";
 import { getAllUser } from "../controllers/user.controller";
 import catchAsync from "../utils/catchAsync";
-import { getALlPromotion } from "../controllers/promotion.controller";
+import {
+    blockOrActivePromotion,
+    getALlPromotion,
+    savePromotion,
+} from "../controllers/promotion.controller";
 
 /**
  * @description AuthLoginRouter
@@ -17,6 +21,8 @@ class PromotionRouter extends BaseRouter {
      */
     protected init() {
         this.router.get("/", catchAsync(getALlPromotion));
+        this.router.get("/status", catchAsync(blockOrActivePromotion));
+        this.router.post("/", catchAsync(savePromotion));
     }
 }
 

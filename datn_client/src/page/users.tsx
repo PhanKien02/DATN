@@ -157,7 +157,7 @@ const UserManagerPage = () => {
                               ghost
                               className={`${
                                    record.activated
-                                        ? "!bg-yellow-400"
+                                        ? "!bg-red-600"
                                         : "!bg-green-600"
                               } text-white flex items-center gap-2 text-xl justify-center`}
                               onClick={() => {
@@ -178,7 +178,7 @@ const UserManagerPage = () => {
                          </Button>
                          <div>
                               <UserModal
-                                   icon={<IoPersonAddSharp />}
+                                   icon={<FaUserEdit />}
                                    refetch={refetch}
                                    userData={record}
                               />
@@ -200,8 +200,8 @@ const UserManagerPage = () => {
                     <div className="flex items-end justify-between">
                          <h1 className="text-5xl  ml-4">Nhân viên</h1>
                          <UserModal
-                              title="Create User"
-                              icon={<FaUserEdit />}
+                              title="Thêm Nhân Viên"
+                              icon={<IoPersonAddSharp />}
                               refetch={refetch}
                          />
                     </div>

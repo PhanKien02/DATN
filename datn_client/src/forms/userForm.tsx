@@ -48,13 +48,6 @@ const UserForm = ({ setOpen, refetch, userData }: Props) => {
                return Promise.reject("Nhân Viên Chưa Đủ 18 Tuổi");
           else return Promise.resolve();
      };
-     const validatePhone = (value: string) => {
-          const phoneRegex = /^\d{10,11}$/;
-          if (!phoneRegex.test(value)) {
-               return Promise.reject("Số điện thoại không hợp lệ");
-          }
-          return Promise.resolve();
-     };
      const [form] = Form.useForm<IUser>();
      const onFinish = (value: IUser) => {
           if (!isEdit)
@@ -204,7 +197,10 @@ const UserForm = ({ setOpen, refetch, userData }: Props) => {
                                    },
                               ]}
                          >
-                              <Input type="date" />
+                              <Input
+                                   type="date"
+                                   defaultValue={userData?.dob || undefined}
+                              />
                          </Form.Item>
                          <Form.Item
                               label="Giới Tính"
@@ -234,6 +230,7 @@ const UserForm = ({ setOpen, refetch, userData }: Props) => {
                          >
                               <Select
                                    defaultValue={provinceId}
+                                   value={provinceId}
                                    onChange={(value) =>
                                         handleProvinceChange(value)
                                    }
@@ -260,6 +257,7 @@ const UserForm = ({ setOpen, refetch, userData }: Props) => {
                          >
                               <Select
                                    defaultValue={districtId}
+                                   value={districtId}
                                    disabled={provinceId ? false : true}
                                    onChange={(value) =>
                                         handleDistrictChange(value)
@@ -287,6 +285,7 @@ const UserForm = ({ setOpen, refetch, userData }: Props) => {
                          >
                               <Select
                                    defaultValue={wardId}
+                                   value={wardId}
                                    disabled={districtId ? false : true}
                                    onChange={(value) => handleWardChange(value)}
                                    options={

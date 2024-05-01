@@ -11,7 +11,7 @@ export interface IUser {
 
     phone?: string;
 
-    doB?: Date;
+    dob?: Date;
 
     avatar?: string;
 

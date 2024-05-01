@@ -8,6 +8,7 @@ import { FaUserTie } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
 import { FaFileInvoiceDollar } from "react-icons/fa";
+import { MdPriceCheck } from "react-icons/md";
 export type MenuItems = {
      title: string;
      icon?: IconType;
@@ -42,7 +43,7 @@ export const MenuItems: MenuItems[] = [
                     key: "1",
                     label: (
                          <NavLink
-                              to="/NhanVien"
+                              to="/nhan-vien"
                               className="flex items-center gap-3 !text-blue-600"
                          >
                               <FaCarRear /> <span>Tài Xế</span>
@@ -53,7 +54,7 @@ export const MenuItems: MenuItems[] = [
                     key: "1",
                     label: (
                          <NavLink
-                              to="/NhanVien"
+                              to="/nhan-vien"
                               className="flex items-center gap-3 !text-blue-600"
                          >
                               <FaUser /> <span>Người Dùng</span>
@@ -61,5 +62,23 @@ export const MenuItems: MenuItems[] = [
                     ),
                },
           ],
+     },
+     {
+          title: "Đơn Giá",
+          link: "###",
+          id: "price",
+          icon: MdPriceCheck,
+     },
+     {
+          title: "Khuyễn Mãi",
+          link: "/khuyen-mai",
+          id: "promotion",
+          icon: MdDiscount,
+     },
+     {
+          title: "Hóa Đơn",
+          link: "###",
+          id: "invoice",
+          icon: FaFileInvoiceDollar,
      },
 ];
