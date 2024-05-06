@@ -1,15 +1,15 @@
 import { Button, Modal } from "antd";
 import { useState } from "react";
-import { IPromotion } from "../models/promotion";
-import PromotionForm from "../forms/promotionForm";
+import UnitPriceForm from "../forms/unitPriceForm";
+import { IUnitPrice } from "../models/unitPrice";
 
 interface Props {
      title?: string;
      icon?: JSX.Element;
-     data?: IPromotion;
+     data?: IUnitPrice;
      refetch: any;
 }
-const PromotionModal = ({ title, icon, refetch, data }: Props) => {
+const UnitPriceModal = ({ title, icon, refetch, data }: Props) => {
      const [open, setOpen] = useState(false);
      const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -42,15 +42,15 @@ const PromotionModal = ({ title, icon, refetch, data }: Props) => {
                     <span className="mt-1">{icon}</span>
                </Button>
                <Modal
-                    title={title || "Cập Nhật Thông Tin Chương Trình"}
+                    title={title || "Cập Nhật Thông Tin Đơn Giá"}
                     open={open}
                     onOk={handleOk}
                     confirmLoading={confirmLoading}
                     onCancel={handleCancel}
                     footer={null}
-                    width={800}
+                    width={600}
                >
-                    <PromotionForm
+                    <UnitPriceForm
                          setOpen={setOpen}
                          refetch={refetch}
                          data={data}
@@ -60,4 +60,4 @@ const PromotionModal = ({ title, icon, refetch, data }: Props) => {
      );
 };
 
-export default PromotionModal;
+export default UnitPriceModal;

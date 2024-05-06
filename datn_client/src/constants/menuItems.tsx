@@ -65,7 +65,7 @@ export const MenuItems: MenuItems[] = [
      },
      {
           title: "Đơn Giá",
-          link: "###",
+          link: "/don-gia",
           id: "price",
           icon: MdPriceCheck,
      },

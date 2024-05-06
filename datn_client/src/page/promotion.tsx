@@ -10,12 +10,8 @@ import { TbLockCancel } from "react-icons/tb";
 import { TbLockCheck } from "react-icons/tb";
 import promotionService from "../services/promotionService";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 const PromotionManagerPage = () => {
      const { promotion, isLoading, refetch } = useGetPromotion();
-     useEffect(() => {
-          refetch();
-     }, [promotion, refetch]);
      const handleBlockOrActivePromotion = (id: number, status: boolean) => {
           promotionService
                .blockOrActivePromotion(id, status)

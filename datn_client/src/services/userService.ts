@@ -2,7 +2,7 @@ import { IUser } from "../models/user.model";
 import baseRequest from "./baseRequest";
 
 class UserService {
-     private BasseUrl = import.meta.env.FE_BASE_API_URL + "/users";
+     private BasseUrl = import.meta.env.FE_BASE_API_URL + "users";
      async getAllUser(page: number, limit: number, search: string) {
           const response = await baseRequest.get(this.BasseUrl, {
                params: { page, limit, search },

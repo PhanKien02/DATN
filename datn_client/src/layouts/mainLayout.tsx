@@ -55,7 +55,9 @@ const MainLayout = () => {
                                                                       <menu.icon />
                                                                  )}
                                                             </span>
-                                                            {menu.title}
+                                                            <span className="ml-1">
+                                                                 {menu.title}
+                                                            </span>
                                                             <DownOutlined />
                                                        </Space>
                                                   </a>
