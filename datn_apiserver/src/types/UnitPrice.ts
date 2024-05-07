@@ -1,9 +1,11 @@
 export interface PricePayLoad {
+    id: number;
+
     timeStart: Date;
 
     timeEnd: Date;
 
-    price: number;
+    pastPrice: number;
 
-    km: number;
+    presentPrice: number;
 }

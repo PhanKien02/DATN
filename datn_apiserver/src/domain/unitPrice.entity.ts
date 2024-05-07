@@ -27,7 +27,10 @@ export default class UnitPrice extends Model {
     timeEnd: Date;
 
     @Column({ type: DataType.INTEGER })
-    price: number;
+    pastPrice: number;
+
+    @Column({ type: DataType.INTEGER })
+    presentPrice: number;
 
     @Column({ type: DataType.INTEGER })
     kmStart: number;

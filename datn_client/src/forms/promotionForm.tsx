@@ -8,11 +8,10 @@ import { formatDate } from "../utils/formatDate";
 interface Props {
      setOpen: React.Dispatch<React.SetStateAction<boolean>>;
      data?: IPromotion;
-     refetch: () => void;
+     refetch: any;
 }
 const PromotionForm = ({ setOpen, refetch, data }: Props) => {
      const isEdit = data !== undefined;
-     const { RangePicker } = DatePicker;
      const validateDob = (date: string, endDate?: string) => {
           const today = moment();
           if (today.diff(moment(date), "day") > 0)
