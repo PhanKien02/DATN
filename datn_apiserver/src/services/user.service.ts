@@ -18,18 +18,20 @@ import provinceRepository from "../repositories/provinceRepository";
 
 class userService {
     async signUp(newUser: UserPayLoad) {
+        console.log({ newUser });
+
         const checkEmail = await userRepository.findOne({
             where: {
                 email: newUser.email,
             },
         });
         if (checkEmail) throw new BadRequestError("Email Đã Tồn Tại");
-        const checkPhone = await userRepository.findOne({
+        const role = await authorityRepository.findOne({
             where: {
-                phone: newUser.phone,
+                name: newUser.roleName,
             },
         });
-        if (checkPhone) throw new BadRequestError("số điện thoại đã tồn tại");
+        if (!role) throw new BadRequestError("Role Không tồn tại");
         const t = await database.transaction();
         try {
             const otp = genKeyActive();
@@ -37,7 +39,7 @@ class userService {
             const user = await userRepository.create({
                 ...newUser,
                 activated: false,
-                roleId: newUser.roleId,
+                roleId: role.toJSON().id,
                 activeKey: otp,
             });
             await mailService.sendmail(
@@ -62,7 +64,7 @@ class userService {
         });
 
         if (!user)
-            throw new NotFoundError("Email Hoặc Mật Khẩu Không Chính Xác");
+            throw new BadRequestError("Email Hoặc Mật Khẩu Không Chính Xác");
         const checkPassword = await compare(
             login.password,
             user.toJSON().password
@@ -70,7 +72,7 @@ class userService {
         console.log({ checkPassword });
 
         if (!checkPassword)
-            throw new NotFoundError("Email Hoặc Mật Khẩu Không Chính Xác");
+            throw new BadRequestError("Email Hoặc Mật Khẩu Không Chính Xác");
         const token = signToken({
             userId: user["id"],
             roleId: user["roleId"],

@@ -18,4 +18,6 @@ export interface IUser {
     wardId?: number;
 
     roleName?: string;
+
+    fcmId?: string;
 }
