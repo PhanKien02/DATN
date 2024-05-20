@@ -18,7 +18,7 @@ function StartScreen({navigation}: any) {
                     size="2xl"
                     borderRadius={100}
                     style={{
-                        marginTop: '50%',
+                        marginTop: '30%',
                     }}
                 />
                 <Box alignItems="center" marginTop={150}>
@@ -70,7 +70,6 @@ function StartScreen({navigation}: any) {
                         </Text>
                     </Button>
                 </Box>
-                ;
             </Center>
         </View>
     );

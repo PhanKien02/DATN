@@ -1,14 +1,11 @@
 import {
-    Box,
     Button,
     Center,
     FormControl,
     Image,
     Input,
     Text,
-    View,
     Select,
-    HStack,
     VStack,
     ScrollView,
 } from 'native-base';
@@ -18,8 +15,9 @@ import {Controller, useForm} from 'react-hook-form';
 import {isEmail} from '../utils/helpers';
 import {useRegisterMutation} from '../services/api';
 import {Loading} from '../components/Loading';
-function RegisterScreen() {
-    const [register, {isLoading, error, data}] = useRegisterMutation();
+import {screens} from '../navigator/screenName';
+function RegisterScreen({navigation}: any) {
+    const [register, {isLoading, error}] = useRegisterMutation();
     const {
         control,
         watch,
@@ -38,12 +36,16 @@ function RegisterScreen() {
         const {email, fullName, password, roleName} = data;
         register({email, fullName, password, roleName})
             .unwrap()
-            .then(res => console.log({response: res}))
-            .catch(error => console.log(error));
+            .then(res => {
+                navigation.navigate(screens.verifyOTP, {
+                    email: res.email,
+                    fullName: res.fullName,
+                });
+            });
     };
     return (
-        <ScrollView w="full" flexDir="column">
-            <Center w="90%" mx={4}>
+        <ScrollView>
+            <Center>
                 <Image
                     source={{
                         uri: 'https://firebasestorage.googleapis.com/v0/b/datn-44ee0.appspot.com/o/logo.png?alt=media&token=d30f6c0b-3b9b-412f-aaaa-0c07456045cb',
@@ -51,12 +53,8 @@ function RegisterScreen() {
                     alt="Logo"
                     size="2xl"
                     borderRadius={100}
-                    marginTop="60"
                 />
-                <VStack
-                    style={{
-                        width: '100%',
-                    }}>
+                <VStack>
                     <Text
                         fontWeight="bold"
                         fontSize="2xl"
@@ -78,7 +76,7 @@ function RegisterScreen() {
                                     onChangeText={val => onChange(val)}
                                     value={value}
                                     my="2"
-                                    width={370}
+                                    w="90%"
                                     borderRadius="20"
                                     type="text"
                                 />
@@ -103,7 +101,7 @@ function RegisterScreen() {
                                     onChangeText={val => onChange(val)}
                                     value={value}
                                     my="2"
-                                    width={370}
+                                    w="90%"
                                     borderRadius="20"
                                     type="text"
                                 />
@@ -130,7 +128,7 @@ function RegisterScreen() {
                                     onChangeText={val => onChange(val)}
                                     value={value}
                                     my="2"
-                                    width={370}
+                                    w="90%"
                                     borderRadius="20"
                                     type="password"
                                 />
@@ -159,7 +157,7 @@ function RegisterScreen() {
                                     onChangeText={val => onChange(val)}
                                     value={value}
                                     my="2"
-                                    width={370}
+                                    w="90%"
                                     borderRadius="20"
                                     type="password"
                                 />
@@ -180,7 +178,7 @@ function RegisterScreen() {
                             {errors.confirmPass?.message}
                         </FormControl.ErrorMessage>
                     </FormControl>
-                    <FormControl>
+                    <FormControl w="320">
                         <FormControl.Label>
                             Đăng Ký Với Vai Trò
                         </FormControl.Label>
@@ -189,13 +187,14 @@ function RegisterScreen() {
                             render={({field: {onChange, value}}) => (
                                 <Select
                                     borderRadius="20"
-                                    width={370}
+                                    w="full"
                                     onValueChange={(itemValue: string) => {
                                         onChange(itemValue);
                                     }}
                                     selectedValue={value}
                                     placeholder="Chọn Vai Trò">
                                     <Select.Item
+                                        w="100%"
                                         label="Tài Xế"
                                         value={UserRoles.DRIVER}
                                     />
@@ -217,7 +216,8 @@ function RegisterScreen() {
                     {error && (
                         <Center>
                             <Text color="red.600" my={2}>
-                                {error['data'].message}
+                                {error['data']?.message ||
+                                    'Đã Có Lỗi Hệ Thống Vui Lòng Thử Lại Sau'}
                             </Text>
                         </Center>
                     )}
@@ -227,6 +227,7 @@ function RegisterScreen() {
                     backgroundColor="#FBC632"
                     width="330"
                     marginTop={5}
+                    marginBottom={5}
                     borderRadius="full"
                     style={{
                         shadowColor: '#000',
@@ -240,6 +241,7 @@ function RegisterScreen() {
                         elevation: 6,
                     }}
                     shadow="9"
+                    disabled={isLoading}
                     onPress={handleSubmit(onSubmit)}>
                     {isLoading ? (
                         <Loading />

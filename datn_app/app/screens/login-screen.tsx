@@ -1,13 +1,12 @@
 import {
-    Alert,
     Button,
     Center,
     FormControl,
     Image,
     Input,
+    ScrollView,
     Text,
     VStack,
-    View,
 } from 'native-base';
 import React from 'react';
 import {Controller, useForm} from 'react-hook-form';
@@ -15,8 +14,14 @@ import {screens} from '../navigator/screenName';
 import {isEmail} from '../utils/helpers';
 import {useLoginMutation} from '../services/api';
 import {Loading} from '../components/Loading';
+import {useAppDispatch} from '../models/root-store/root-store';
+import Toast from 'react-native-toast-message';
+import {LOGIN} from '../models/auth-slice';
+import {save, saveString} from '../utils/storage';
+import {KeyAsyncStorage} from '../constants/asyncStorage';
 function LoginScreen({navigation}) {
     const [login, {isLoading, data, error}] = useLoginMutation();
+    const dispath = useAppDispatch();
     const {
         control,
         handleSubmit,
@@ -28,16 +33,36 @@ function LoginScreen({navigation}) {
         },
     });
     const onSubmit = data => {
-        console.log({data});
         login(data)
             .unwrap()
-            .then(payload => console.log('fulfilled', payload))
+            .then(payload => {
+                const auth = {
+                    user: payload.user,
+                    token: payload.token.token,
+                };
+                dispath(LOGIN(auth));
+                saveString(KeyAsyncStorage.TOKEN, payload.token.token);
+                save(KeyAsyncStorage.USER, payload.user);
+                Toast.show({
+                    type: 'success',
+                    text1: `Chúc Mừng ${payload.user.fullName} Đã Đăng Nhập Tài Khoản Thành Công`,
+                });
+                if (payload.user.activated)
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: screens.home}],
+                    });
+                else
+                    navigation.navigate(screens.verifyOTP, {
+                        email: payload.user.email,
+                        fullName: payload.user.fullName,
+                    });
+            })
             .catch(error => console.error('rejected', error));
     };
-    console.log({isLoading, data, error});
 
     return (
-        <View>
+        <ScrollView>
             <Center>
                 <Image
                     source={{
@@ -46,7 +71,6 @@ function LoginScreen({navigation}) {
                     alt="Logo"
                     size="2xl"
                     borderRadius={100}
-                    marginTop="60"
                 />
                 <VStack marginTop={30}>
                     <Text
@@ -60,7 +84,7 @@ function LoginScreen({navigation}) {
                         Đăng Nhập
                     </Text>
                     <FormControl isRequired isInvalid={'email' in errors}>
-                        <FormControl.Label>First Name</FormControl.Label>
+                        <FormControl.Label>Email</FormControl.Label>
                         <Controller
                             control={control}
                             render={({field: {onChange, onBlur, value}}) => (
@@ -83,11 +107,11 @@ function LoginScreen({navigation}) {
                             }}
                         />
                         <FormControl.ErrorMessage>
-                            {errors.email?.message}
+                            {errors?.email?.message}
                         </FormControl.ErrorMessage>
                     </FormControl>
                     <FormControl isRequired isInvalid={'password' in errors}>
-                        <FormControl.Label>First Name</FormControl.Label>
+                        <FormControl.Label>Password</FormControl.Label>
                         <Controller
                             control={control}
                             render={({field: {onChange, onBlur, value}}) => (
@@ -117,13 +141,16 @@ function LoginScreen({navigation}) {
                     </FormControl>
                     <Center>
                         {error && (
-                            <Text color="red.600">{error['data'].message}</Text>
+                            <Text color="red.600">
+                                {error['data']?.message || 'Đăng Nhập THất Bại'}
+                            </Text>
                         )}
                         <Button
                             alignItems="center"
                             backgroundColor="#FBC632"
                             width="330"
                             marginTop={5}
+                            marginBottom={20}
                             borderRadius="full"
                             style={{
                                 shadowOffset: {
@@ -136,6 +163,7 @@ function LoginScreen({navigation}) {
                                 elevation: 6,
                             }}
                             shadow="9"
+                            disabled={isLoading}
                             onPress={handleSubmit(onSubmit)}>
                             {isLoading ? (
                                 <Loading />
@@ -151,7 +179,7 @@ function LoginScreen({navigation}) {
                     </Center>
                 </VStack>
             </Center>
-        </View>
+        </ScrollView>
     );
 }
 

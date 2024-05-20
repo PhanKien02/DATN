@@ -6,7 +6,7 @@ export const api = createApi({
 
     // Cấu hình chung cho tất cả request
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://192.168.1.1:8000/api/',
+        baseUrl: 'http://192.168.1.25:8000/api/',
         prepareHeaders: (headers, {getState}) => {
             // getState() giúp lấy ra toàn bộ state trong store
             // getState().user lấy ra state trong userSlice
@@ -38,6 +38,26 @@ export const api = createApi({
                 body: {email, fullName, password, roleName},
             }),
         }),
+
+        verifyOTP: builder.mutation({
+            query: ({email, otp}) => ({
+                url: 'authenticate/verify',
+                method: 'POST',
+                params: {email, otp},
+            }),
+        }),
+        resendOTP: builder.mutation({
+            query: ({email}) => ({
+                url: 'authenticate/resend-verify',
+                method: 'POST',
+                params: {email},
+            }),
+        }),
     }),
 });
-export const {useLoginMutation, useRegisterMutation} = api;
+export const {
+    useLoginMutation,
+    useRegisterMutation,
+    useVerifyOTPMutation,
+    useResendOTPMutation,
+} = api;

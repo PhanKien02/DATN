@@ -1,11 +1,12 @@
 import nodemailer from "nodemailer";
+import "dotenv/config";
 import { BadRequestError } from "../utils/httpErrors";
 class MailService {
     private transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-            user: "kien1st02@gmail.com",
-            pass: "fhfvqgbdxbzbuhwo",
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASS,
         },
     });
 
@@ -13,7 +14,7 @@ class MailService {
         await this.transporter
             .sendMail({
                 to: to, // list of receivers
-                from: process.env.MAIL_SENDER, // sender address
+                from: process.env.EMAIL, // sender address
                 subject: subject, // Subject line
                 html: html, // HTML body content
             })

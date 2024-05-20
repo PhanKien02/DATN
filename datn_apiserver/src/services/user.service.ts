@@ -15,11 +15,10 @@ import { User } from "../utils/user";
 import wardRepository from "../repositories/wardRepository";
 import districtsRepository from "../repositories/districtsRepository";
 import provinceRepository from "../repositories/provinceRepository";
+import { SubjectEmail } from "../constants/email";
 
 class userService {
     async signUp(newUser: UserPayLoad) {
-        console.log({ newUser });
-
         const checkEmail = await userRepository.findOne({
             where: {
                 email: newUser.email,
@@ -44,13 +43,13 @@ class userService {
             });
             await mailService.sendmail(
                 newUser.email,
-                "Active Accout",
+                SubjectEmail.ACTIVE,
                 mailActive(newUser.fullName, otp)
             );
-            t.commit();
+            await t.commit();
             return user;
         } catch (error) {
-            t.rollback();
+            await t.rollback();
             throw new BadRequestError("Đăng Ký Người Dùng Thất Bại");
         }
     }
@@ -58,7 +57,6 @@ class userService {
         const user = await userRepository.findOne({
             where: {
                 email: login.email,
-                activated: true,
             },
             nest: true,
         });
@@ -69,8 +67,6 @@ class userService {
             login.password,
             user.toJSON().password
         );
-        console.log({ checkPassword });
-
         if (!checkPassword)
             throw new BadRequestError("Email Hoặc Mật Khẩu Không Chính Xác");
         const token = signToken({
@@ -216,6 +212,53 @@ class userService {
                 },
             }
         );
+    }
+
+    async verifyAccout(email: string, otp: string) {
+        const user = await userRepository.findOne({
+            where: {
+                email: email,
+                activeKey: otp,
+            },
+            raw: true,
+        });
+        if (!user) throw new BadRequestError("OTP Không Đúng");
+        return await userRepository.update(
+            { activated: true },
+            {
+                where: {
+                    email: email,
+                    activeKey: otp,
+                },
+            }
+        );
+    }
+    async resendActive(email: string) {
+        const otp = genKeyActive();
+        console.log({ otp });
+        const t = await database.transaction();
+        const user = await userRepository.findOne({
+            where: {
+                email: email,
+                activated: false,
+            },
+        });
+        if (!user) throw new BadRequestError("Email Không Tồn Tại");
+        try {
+            await userRepository.update(
+                { activeKey: otp },
+                { where: { email: email } }
+            );
+            await mailService.sendmail(
+                email,
+                SubjectEmail.ACTIVE,
+                mailActive(user.toJSON().fullName, otp)
+            );
+            await t.commit();
+        } catch (error) {
+            await t.rollback();
+            throw new BadRequestError("Resend OTP Thất Bại");
+        }
     }
 }
 export default new userService();

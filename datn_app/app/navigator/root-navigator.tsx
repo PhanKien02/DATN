@@ -7,15 +7,15 @@ import {screens} from './screenName';
 import RegisterScreen from '../screens/register-screen';
 import {HomeTab} from './home-navigator';
 import VerifyOTP from '../screens/verifyOTP';
-
+import {RootState, useAppSelector} from '../models/root-store/root-store';
 const Stack = createNativeStackNavigator();
-const RootStack = () => {
+const RootStack = ({initialRouteName}) => {
     return (
         <Stack.Navigator
             screenOptions={{
                 headerShown: false,
             }}
-            initialRouteName={screens.verifyOTP}>
+            initialRouteName={initialRouteName}>
             <Stack.Screen
                 name={screens.start}
                 component={StartScreen}
@@ -55,9 +55,12 @@ const RootStack = () => {
     );
 };
 export const RootNavigator = () => {
+    const {user, token} = useAppSelector((state: RootState) => state.auth);
+
+    const initScreen = user && token ? screens.home : screens.start;
     return (
         <NavigationContainer>
-            <RootStack />
+            <RootStack initialRouteName={initScreen} />
         </NavigationContainer>
     );
 };
