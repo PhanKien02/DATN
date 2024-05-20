@@ -49,3 +49,19 @@ export const blockOrActiveUser = async (
     );
     return res.status(httpStatus.OK).send("OK");
 };
+
+export const verifyAccout = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const email = req.query.email as string;
+    const otp = req.query.otp as string;
+    const response = await userService.verifyAccout(email, otp);
+    return res.status(httpStatus.OK).send(response);
+};
+
+export const resendEmail = async (req: AuthenticatedRequest, res: Response) => {
+    const email = req.query.email as string;
+    const response = await userService.resendActive(email);
+    return res.status(httpStatus.OK).send(response);
+};

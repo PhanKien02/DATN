@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { BaseRouter } from "./BaseRouter";
 import userRepository from "../repositories/userRepository";
-import { login, signUp } from "../controllers/user.controller";
+import {
+    login,
+    resendEmail,
+    signUp,
+    verifyAccout,
+} from "../controllers/user.controller";
 import catchAsync from "../utils/catchAsync";
 
 /**
@@ -19,6 +24,8 @@ class AuthLoginRouter extends BaseRouter {
     protected init() {
         this.router.post("/login", catchAsync(login));
         this.router.post("/sign-up", catchAsync(signUp));
+        this.router.post("/verify", catchAsync(verifyAccout));
+        this.router.post("/resend-verify", catchAsync(resendEmail));
     }
 }
 

@@ -108,11 +108,12 @@ export default class User extends Model {
 
     @BeforeUpdate
     @BeforeCreate
-    static async hashPassword(instance: User | User[]) {
-        if (Array.isArray(instance)) {
-            instance.map(async (i) => {
-                return (i.password = await getHashPassword(i.password));
-            });
-        } else instance.password = await getHashPassword(instance.password);
+    static async hashPassword(instance: User) {
+        instance.password = await getHashPassword(instance.password.trim());
+    }
+    @BeforeUpdate
+    @BeforeCreate
+    static async toLowerCaseEmail(instance: User) {
+        instance.email = instance.email.toLowerCase().trim();
     }
 }

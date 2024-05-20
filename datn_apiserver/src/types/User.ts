@@ -21,7 +21,7 @@ export interface UserPayLoad {
 
     wardId?: string;
 
-    roleId?: number;
+    roleName?: string;
 }
 export interface UserResponse {
     users: IUser[];
