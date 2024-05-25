@@ -1,4 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import authSlice from '../models/auth-slice';
+import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 
 export const api = createApi({
     // Tương tự tên Slice khi tạo Slice thông thường
@@ -6,11 +8,12 @@ export const api = createApi({
 
     // Cấu hình chung cho tất cả request
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://192.168.1.25:8000/api/',
+        baseUrl: 'http://192.168.1.13:8000/api/',
         prepareHeaders: (headers, {getState}) => {
             // getState() giúp lấy ra toàn bộ state trong store
             // getState().user lấy ra state trong userSlice
-            const token = getState();
+            const token = getState()['auth'].token;
+            console.log({token});
 
             // Nếu có token thì thêm vào headers
             if (token) {
@@ -53,6 +56,12 @@ export const api = createApi({
                 params: {email},
             }),
         }),
+        caculateDistance: builder.mutation({
+            query: ({destinationAddress, departureAddress}) => ({
+                url: `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destinationAddress}&origins=${departureAddress}&units=imperial&key=${API_GG_MAP_KEY}`,
+                method: 'POST',
+            }),
+        }),
     }),
 });
 export const {
@@ -60,4 +69,5 @@ export const {
     useRegisterMutation,
     useVerifyOTPMutation,
     useResendOTPMutation,
+    useCaculateDistanceMutation,
 } = api;

@@ -103,7 +103,7 @@ function LoginScreen({navigation}) {
                             rules={{
                                 required: 'Vui Lòng Nhập Email',
                                 validate: value =>
-                                    isEmail(value) || 'Invalid email format',
+                                    isEmail(value) || 'Email Không Hợp Lệ',
                             }}
                         />
                         <FormControl.ErrorMessage>
@@ -142,7 +142,7 @@ function LoginScreen({navigation}) {
                     <Center>
                         {error && (
                             <Text color="red.600">
-                                {error['data']?.message || 'Đăng Nhập THất Bại'}
+                                {error['data']?.message || 'Đăng Nhập Thất Bại'}
                             </Text>
                         )}
                         <Button

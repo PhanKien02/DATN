@@ -20,6 +20,7 @@ import Notification from "./notification.entity";
 import Booking from "./booking.entity";
 import Wards from "./wards.entity";
 import Income from "./income.entity";
+import RouteDriver from "./routeDriver.entity";
 
 @Table
 export default class User extends Model {
@@ -54,6 +55,9 @@ export default class User extends Model {
 
     @Column({ type: DataType.DATE })
     dob?: Date;
+
+    @Column({ type: DataType.BOOLEAN })
+    statusDriver: boolean;
 
     @Column({ type: DataType.STRING })
     avatar?: string;
@@ -102,6 +106,9 @@ export default class User extends Model {
 
     @HasMany(() => Booking, "driverId")
     driverBooking: Booking[];
+
+    @HasMany(() => RouteDriver)
+    routeDriver: RouteDriver[];
 
     @HasMany(() => Notification)
     notification: Notification[];
