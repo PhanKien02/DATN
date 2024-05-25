@@ -57,8 +57,6 @@ function VerifyOTP({route, navigation}: any) {
             });
     };
     const resendOTP = () => {
-        console.log({email});
-
         resend({email})
             .unwrap()
             .then(res => {
@@ -68,8 +66,6 @@ function VerifyOTP({route, navigation}: any) {
                 });
             })
             .catch(error => {
-                console.log({error});
-
                 Toast.show({
                     type: 'error',
                     text1: `${
