@@ -1,4 +1,4 @@
-import {Button, Center, ScrollView, Text, VStack, View} from 'native-base';
+import {Button, Center, Text, VStack, View} from 'native-base';
 import {useAppSelector} from '../models/root-store/root-store';
 import SVGLocationIcon from '../components/icons/location';
 import MapView, {
@@ -50,7 +50,6 @@ export const HomeScreen = () => {
         const locPermissionDenied = await requestLocationPermission();
         if (locPermissionDenied.success) {
             const {latitude, longitude, heading} = await getCurrentPosition();
-            console.log('get live location after 4 second', heading);
             new AnimatedRegion({latitude, longitude});
             setDepartureRegion({
                 latitude: latitude,
@@ -117,10 +116,6 @@ export const HomeScreen = () => {
         if (!departureRegion.latitude || !departureRegion.longitude)
             getLiveLocation();
     }, [departureRegion.latitude, departureRegion.longitude]);
-    console.log({
-        lat: departureRegion.latitude,
-        lng: departureRegion.longitude,
-    });
 
     useEffect(() => {
         if (mapRef.current) {
@@ -192,7 +187,7 @@ export const HomeScreen = () => {
                         Xin Chào
                     </Text>
                     <Text ml={10} mt={1} fontWeight="bold" color="white">
-                        {user.user.fullName}
+                        {user?.user.fullName}
                     </Text>
                 </View>
                 <Center>
@@ -320,10 +315,6 @@ export const HomeScreen = () => {
                             onPoiClick={event => {
                                 const {coordinate, placeId, name} =
                                     event.nativeEvent;
-                                console.log('POI Clicked:');
-                                console.log('Coordinate:', coordinate);
-                                console.log('Place ID:', placeId);
-                                console.log('Name:', name);
                                 setDestinationRegion({
                                     latitude: coordinate.latitude,
                                     longitude: coordinate.longitude,

@@ -16,6 +16,7 @@ import wardRepository from "../repositories/wardRepository";
 import districtsRepository from "../repositories/districtsRepository";
 import provinceRepository from "../repositories/provinceRepository";
 import { SubjectEmail } from "../constants/email";
+import { UserRoles } from "../types/userRoles";
 
 class userService {
     async signUp(newUser: UserPayLoad) {
@@ -39,6 +40,8 @@ class userService {
                 ...newUser,
                 activated: false,
                 roleId: role.toJSON().id,
+                statusDriver:
+                    newUser.roleName === UserRoles.DRIVER ? true : null,
                 activeKey: otp,
             });
             await mailService.sendmail(
@@ -58,6 +61,12 @@ class userService {
             where: {
                 email: login.email,
             },
+            include: [
+                {
+                    model: authorityRepository,
+                    attributes: ["name"],
+                },
+            ],
             nest: true,
         });
 
@@ -77,7 +86,7 @@ class userService {
         });
         return {
             token: token,
-            user: user,
+            user: { ...user.toJSON(), roleName: user.toJSON().role.name },
         };
     }
     async createStaff(user: User, payload: UserPayLoad) {
@@ -171,7 +180,6 @@ class userService {
     }
     async updateStaff(user: User, userUpdate: UserPayLoad) {
         const userForUpdate = await userRepository.findByPk(userUpdate.id);
-        console.log({ ward: userUpdate.wardId });
         if (!userForUpdate)
             throw new BadRequestError("Nhân Viên Không Tồn Tại");
         else
@@ -235,7 +243,6 @@ class userService {
     }
     async resendActive(email: string) {
         const otp = genKeyActive();
-        console.log({ otp });
         const t = await database.transaction();
         const user = await userRepository.findOne({
             where: {

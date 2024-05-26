@@ -1,5 +1,4 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import authSlice from '../models/auth-slice';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 
 export const api = createApi({
@@ -8,12 +7,11 @@ export const api = createApi({
 
     // Cấu hình chung cho tất cả request
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://192.168.1.13:8000/api/',
+        baseUrl: 'http://192.168.1.8:8000/api/',
         prepareHeaders: (headers, {getState}) => {
             // getState() giúp lấy ra toàn bộ state trong store
             // getState().user lấy ra state trong userSlice
             const token = getState()['auth'].token;
-            console.log({token});
 
             // Nếu có token thì thêm vào headers
             if (token) {
