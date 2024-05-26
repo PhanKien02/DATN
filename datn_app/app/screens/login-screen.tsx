@@ -20,7 +20,7 @@ import {LOGIN} from '../models/auth-slice';
 import {save, saveString} from '../utils/storage';
 import {KeyAsyncStorage} from '../constants/asyncStorage';
 function LoginScreen({navigation}) {
-    const [login, {isLoading, data, error}] = useLoginMutation();
+    const [login, {isLoading, error}] = useLoginMutation();
     const dispath = useAppDispatch();
     const {
         control,

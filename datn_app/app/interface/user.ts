@@ -20,4 +20,6 @@ export interface IUser {
     roleName?: string;
 
     fcmId?: string;
+
+    statusDriver?: string;
 }

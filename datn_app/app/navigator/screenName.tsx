@@ -10,4 +10,5 @@ export enum screens {
     forgotPassword = 'forgotPassword',
     verifyOTP = 'verifyOTP',
     resetPassword = 'resetPassword',
+    income = 'income',
 }

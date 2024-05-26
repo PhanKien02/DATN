@@ -8,8 +8,13 @@ import RegisterScreen from '../screens/register-screen';
 import {HomeTab} from './home-navigator';
 import VerifyOTP from '../screens/verifyOTP';
 import {RootState, useAppSelector} from '../models/root-store/root-store';
+import {UserRoles} from '../models/enums/userRoles';
+import {DriverTab} from './driver-navigator';
 const Stack = createNativeStackNavigator();
 const RootStack = ({initialRouteName}) => {
+    const {user} = useAppSelector((state: RootState) => state.auth);
+    const role = user?.roleName;
+
     return (
         <Stack.Navigator
             screenOptions={{
@@ -44,19 +49,28 @@ const RootStack = ({initialRouteName}) => {
                     headerShown: false,
                 }}
             />
-            <Stack.Screen
-                name={screens.home}
-                component={HomeTab}
-                options={{
-                    headerShown: false,
-                }}
-            />
+            {role === UserRoles.USER ? (
+                <Stack.Screen
+                    name={screens.home}
+                    component={HomeTab}
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+            ) : (
+                <Stack.Screen
+                    name={screens.home}
+                    component={DriverTab}
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+            )}
         </Stack.Navigator>
     );
 };
 export const RootNavigator = () => {
     const {user, token} = useAppSelector((state: RootState) => state.auth);
-
     const initScreen = user && token ? screens.home : screens.start;
     return (
         <NavigationContainer>

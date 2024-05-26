@@ -5,7 +5,6 @@ import httpStatus from "http-status";
 
 export const getAllPrice = async (req: AuthenticatedRequest, res: Response) => {
     const result = await unitPriceService.getAllPrice();
-    console.log({ result });
 
     return res.status(httpStatus.OK).send(result);
 };

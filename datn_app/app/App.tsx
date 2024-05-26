@@ -16,6 +16,7 @@ function App() {
     useEffect(() => {
         SplashScreen.hide();
     }, []);
+
     return (
         <NativeBaseProvider theme={theme}>
             <Provider store={store}>

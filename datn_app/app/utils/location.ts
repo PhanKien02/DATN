@@ -34,9 +34,7 @@ export const getCurrentPosition = (): Promise<PositionProps> =>
     });
 
 export const getLocationFromAddress = async (address: string) => {
-    console.log({address});
     const data = await Geocoder.from(address);
-    console.log(data.results[0].geometry.location);
 
     return data.results[0].geometry.location;
 };
