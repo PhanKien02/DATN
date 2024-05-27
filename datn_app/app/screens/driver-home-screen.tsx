@@ -1,4 +1,4 @@
-import {Button, Center, Text, View} from 'native-base';
+import {Center, Text, View} from 'native-base';
 import {useAppSelector} from '../models/root-store/root-store';
 import MapView, {
     PROVIDER_GOOGLE,
@@ -9,9 +9,9 @@ import {Alert, Dimensions, StyleSheet} from 'react-native';
 import {useEffect, useRef, useState} from 'react';
 import {openSettings} from 'react-native-permissions';
 import {requestLocationPermission} from '../utils/permissions';
-import {getAddressFromLocation, getCurrentPosition} from '../utils/location';
+import {getAddressFromLocation, trackingLocation} from '../utils/location';
 import {useCaculateDistanceMutation} from '../services/api';
-import SVGPowerOff from '../components/icons/powerOff';
+// import SVGPowerOff from '../components/icons/powerOff';
 interface PositionProps {
     latitude?: number;
     longitude?: number;
@@ -32,7 +32,6 @@ export const DriverHomeScreen = () => {
     const [caculateDistance] = useCaculateDistanceMutation();
     const mapRef = useRef(null);
     const [departureAddress, setDepartureAddress] = useState('');
-    const [destinationAddress, setDestinationAddress] = useState('');
     const [departureRegion, setDepartureRegion] = useState<PositionProps>({});
     // const [destinationRegion, setDestinationRegion] = useState<PositionProps>(
     //     {},
@@ -40,7 +39,7 @@ export const DriverHomeScreen = () => {
     const getLiveLocation = async () => {
         const locPermissionDenied = await requestLocationPermission();
         if (locPermissionDenied.success) {
-            const {latitude, longitude, heading} = await getCurrentPosition();
+            const {latitude, longitude, heading} = await trackingLocation();
             console.log('get live location after 4 second', heading);
             new AnimatedRegion({latitude, longitude});
             setDepartureRegion({
@@ -79,18 +78,6 @@ export const DriverHomeScreen = () => {
             );
         }
     }, [departureRegion]);
-    useEffect(() => {
-        departureAddress &&
-            destinationAddress &&
-            caculateDistance({departureAddress, destinationAddress}).then(
-                res => {
-                    console.log(
-                        'data',
-                        res.data.rows[0].elements[0].distance.value,
-                    );
-                },
-            );
-    }, [departureAddress, destinationAddress]);
 
     return (
         <>

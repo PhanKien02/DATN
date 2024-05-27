@@ -8,13 +8,105 @@ import {
     initialWindowMetrics,
 } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {store} from './models/root-store/root-store';
+import {store, useAppDispatch} from './models/root-store/root-store';
 import {Provider} from 'react-redux';
 import {useEffect} from 'react';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import messaging, {
+    firebase,
+    FirebaseMessagingTypes,
+} from '@react-native-firebase/messaging';
+import notifee, {AndroidImportance} from '@notifee/react-native';
+import Firebase from './utils/firebase';
+import {enableScreens} from 'react-native-screens';
+import {setUpRootStore} from './models/root-store/setUp';
+import {SETUP} from './models/auth-slice';
 function App() {
+    async function requestUserPermission() {
+        const authStatus = await messaging().requestPermission();
+        const enabled =
+            authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+            authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+        if (enabled) {
+            console.log('Authorization status:', authStatus);
+        }
+    }
+
+    const handleDetail = data => {
+        console.log('see detail', data);
+    };
+
+    const listenNotification = () => {
+        Firebase.getInitialNotification(handleDetail);
+        // Firebase.setBackgroundMessageHandler()
+        Firebase.onNotificationOpenedApp(handleDetail);
+    };
+    enableScreens();
     useEffect(() => {
+        (async () => {
+            requestUserPermission().then();
+            listenNotification();
+        })();
         SplashScreen.hide();
+    }, []);
+
+    firebase
+        .messaging()
+        .setBackgroundMessageHandler(
+            async (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
+                // Increment the count by 1
+                await notifee.incrementBadgeCount();
+            },
+        );
+
+    useEffect(() => {
+        listenNotification();
+        // iOS > 12
+        notifee.requestPermission({
+            criticalAlert: true,
+        });
+
+        const unsubscribe = Firebase.onMessage(async dataCallBack => {
+            await notifee.deleteChannel('important');
+            // Create a channel
+            const channelId = await notifee.createChannel({
+                id: 'important',
+                name: 'Important Notifications',
+                importance: AndroidImportance.HIGH,
+                sound: 'default',
+            });
+
+            try {
+                // Display a notification
+                notifee.displayNotification({
+                    title: `${dataCallBack.notification.title}`,
+                    subtitle: '',
+                    body: dataCallBack.notification.body,
+                    data: dataCallBack.data,
+                    android: {
+                        channelId,
+                        color: '#FF8A00',
+                        importance: AndroidImportance.HIGH,
+                        actions: [
+                            {
+                                title: '<b>Có Chuyến Đi Mới</b>',
+                                pressAction: {
+                                    id: 'dance',
+                                },
+                            },
+                        ],
+                        sound: 'default',
+                    },
+                    ios: {
+                        sound: 'local.wav',
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        });
+        return unsubscribe;
     }, []);
 
     return (
@@ -39,7 +131,7 @@ function App() {
                                     text2Style={{
                                         fontSize: 16,
                                     }}
-                                    text2NumberOfLines={4} // Cho phép nhiều dòng cho văn bản text2
+                                    text2NumberOfLines={4}
                                     text1NumberOfLines={4}
                                 />
                             ),
@@ -53,7 +145,7 @@ function App() {
                                     text2Style={{
                                         fontSize: 16,
                                     }}
-                                    text2NumberOfLines={4} // Cho phép nhiều dòng cho văn bản text2
+                                    text2NumberOfLines={4}
                                     text1NumberOfLines={4}
                                 />
                             ),

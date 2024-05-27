@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "714857124227",
+    "project_id": "datn-44ee0",
+    "storage_bucket": "datn-44ee0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714857124227:android:b4399d95855b77fd5fa6b6",
+        "android_client_info": {
+          "package_name": "com.datn_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi2jCakPSWO6mtTmDDtbdfj_if2Kd-y3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

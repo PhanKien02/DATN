@@ -84,6 +84,16 @@ class userService {
             email: user["email"],
             fullName: user["fullName"],
         });
+        if (login.fcmId)
+            await userRepository.update(
+                { fcmId: login.fcmId },
+                {
+                    where: {
+                        email: login.email,
+                        id: user.toJSON().id,
+                    },
+                }
+            );
         return {
             token: token,
             user: { ...user.toJSON(), roleName: user.toJSON().role.name },

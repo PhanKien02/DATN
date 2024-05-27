@@ -19,6 +19,8 @@ import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import MapViewDirections from 'react-native-maps-directions';
 import {useCaculateDistanceMutation} from '../services/api';
+import Toast from 'react-native-toast-message';
+import {Loading} from '../components/Loading';
 interface PositionProps {
     latitude?: number;
     longitude?: number;
@@ -112,6 +114,13 @@ export const HomeScreen = () => {
                 }
             });
     };
+    const handleSearchDriver = () => {
+        if (!departureAddress || !destinationAddress)
+            return Toast.show({
+                type: 'error',
+                text2: 'Vui Lòng Nhập Điểm Đi Và Điểm Đến',
+            });
+    };
     useEffect(() => {
         if (!departureRegion.latitude || !departureRegion.longitude)
             getLiveLocation();
@@ -173,6 +182,13 @@ export const HomeScreen = () => {
                 },
             );
     }, [departureAddress, destinationAddress]);
+    console.log({
+        departureRegion,
+        departureAddress,
+        destinationRegion,
+        destinationAddress,
+    });
+
     return (
         <>
             <View w="100%" h="72" margin={0}>
@@ -209,12 +225,7 @@ export const HomeScreen = () => {
                             shadowRadius: 15.0,
                             elevation: 6,
                         }}>
-                        <View
-                            ml={4}
-                            mt={5}
-                            fontWeight="bold"
-                            flexDir="row"
-                            w="90%">
+                        <View ml={4} fontWeight="bold" flexDir="row" w="90%">
                             <View zIndex={1}>
                                 <SVGLocationIcon />
                             </View>
@@ -225,7 +236,6 @@ export const HomeScreen = () => {
                                         data.description,
                                     );
                                 }}
-                                minLength={10}
                                 ref={departureAddressPlacesRef}
                                 query={{
                                     key: API_GG_MAP_KEY,
@@ -276,11 +286,11 @@ export const HomeScreen = () => {
                                 debounce={300}
                                 styles={{
                                     listView: {
-                                        height: '200',
+                                        height: '100%',
                                         overflow: 'scroll',
                                         marginLeft: -50,
-                                        maxHeight: 200,
-                                        zIndex: 40,
+                                        position: 'relative',
+                                        left: 10,
                                     },
                                     container: {
                                         marginLeft: -20,
@@ -313,8 +323,7 @@ export const HomeScreen = () => {
                             style={styles.map}
                             ref={mapRef}
                             onPoiClick={event => {
-                                const {coordinate, placeId, name} =
-                                    event.nativeEvent;
+                                const {coordinate} = event.nativeEvent;
                                 setDestinationRegion({
                                     latitude: coordinate.latitude,
                                     longitude: coordinate.longitude,
@@ -410,7 +419,11 @@ export const HomeScreen = () => {
                                 width: '100%',
                                 bottom: 0,
                             }}>
-                            <Button borderRadius={20}>Tìm Kiếm Tài Xế</Button>
+                            <Button
+                                onPress={handleSearchDriver}
+                                borderRadius={20}>
+                                Tìm Kiếm Tài Xế
+                            </Button>
                         </Center>
                     </View>
                 </View>

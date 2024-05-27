@@ -8,7 +8,7 @@ import {
     Text,
     VStack,
 } from 'native-base';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {screens} from '../navigator/screenName';
 import {isEmail} from '../utils/helpers';
@@ -19,8 +19,10 @@ import Toast from 'react-native-toast-message';
 import {LOGIN} from '../models/auth-slice';
 import {save, saveString} from '../utils/storage';
 import {KeyAsyncStorage} from '../constants/asyncStorage';
+import Firebase from '../utils/firebase';
 function LoginScreen({navigation}) {
     const [login, {isLoading, error}] = useLoginMutation();
+    const [fcmId, setFcmId] = useState();
     const dispath = useAppDispatch();
     const {
         control,
@@ -32,8 +34,13 @@ function LoginScreen({navigation}) {
             password: '',
         },
     });
+    useEffect(() => {
+        Firebase.getTokenFirebase().then(token => {
+            setFcmId(token);
+        });
+    });
     const onSubmit = data => {
-        login(data)
+        login({...data, fcmId})
             .unwrap()
             .then(payload => {
                 const auth = {
