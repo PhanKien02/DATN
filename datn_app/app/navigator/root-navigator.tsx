@@ -1,26 +1,29 @@
 import StartScreen from '../screens/start-screen';
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {createRef, useEffect, useRef, useState} from 'react';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LoginScreen from '../screens/login-screen';
 import {screens} from './screenName';
 import RegisterScreen from '../screens/register-screen';
 import {HomeTab} from './home-navigator';
 import VerifyOTP from '../screens/verifyOTP';
-import {RootState, useAppSelector} from '../models/root-store/root-store';
+import {
+    RootState,
+    useAppDispatch,
+    useAppSelector,
+} from '../models/root-store/root-store';
 import {UserRoles} from '../models/enums/userRoles';
 import {DriverTab} from './driver-navigator';
+import {setUpRootStore} from '../models/root-store/setUp';
+import {SETUP} from '../models/auth-slice';
 const Stack = createNativeStackNavigator();
-const RootStack = ({initialRouteName}) => {
-    const {user} = useAppSelector((state: RootState) => state.auth);
-    const role = user?.roleName;
-
+const RootStack = ({initScreen}) => {
     return (
         <Stack.Navigator
             screenOptions={{
                 headerShown: false,
             }}
-            initialRouteName={initialRouteName}>
+            initialRouteName={initScreen}>
             <Stack.Screen
                 name={screens.start}
                 component={StartScreen}
@@ -49,32 +52,52 @@ const RootStack = ({initialRouteName}) => {
                     headerShown: false,
                 }}
             />
-            {role === UserRoles.USER ? (
-                <Stack.Screen
-                    name={screens.home}
-                    component={HomeTab}
-                    options={{
-                        headerShown: false,
-                    }}
-                />
-            ) : (
-                <Stack.Screen
-                    name={screens.home}
-                    component={DriverTab}
-                    options={{
-                        headerShown: false,
-                    }}
-                />
-            )}
+            <Stack.Screen
+                name={screens.home}
+                component={HomeTab}
+                options={{
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name={screens.driver}
+                component={DriverTab}
+                options={{
+                    headerShown: false,
+                }}
+            />
         </Stack.Navigator>
     );
 };
-export const RootNavigator = () => {
-    const {user, token} = useAppSelector((state: RootState) => state.auth);
-    const initScreen = user && token ? screens.home : screens.start;
+const NaviagaterContainer = () => {
+    const navigationRef = useRef(null);
+    const {user} = useAppSelector((state: RootState) => state.auth);
+    const role = user?.roleName;
+    const [initScreen, setInitScreen] = useState('');
+    useEffect(() => {
+        if (role === UserRoles.DRIVER) {
+            setInitScreen(screens.driver);
+            navigationRef?.current?.navigate(screens.driver);
+        } else if (role === UserRoles.USER) {
+            setInitScreen(screens.home);
+            navigationRef?.current?.navigate(screens.home);
+        } else setInitScreen(screens.start);
+    }, [role]);
+    console.log({user});
     return (
-        <NavigationContainer>
-            <RootStack initialRouteName={initScreen} />
+        <NavigationContainer ref={navigationRef}>
+            <RootStack initScreen={initScreen} />
         </NavigationContainer>
     );
+};
+export const RootNavigator = () => {
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        setUpRootStore()
+            .then(({user, token}) => dispatch(SETUP({user, token})))
+            .catch(er => {
+                console.log('Error', er);
+            });
+    }, []);
+    return <NaviagaterContainer />;
 };

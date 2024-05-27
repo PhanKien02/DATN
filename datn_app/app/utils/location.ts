@@ -11,7 +11,7 @@ interface PositionProps {
 
 export const getCurrentPosition = (): Promise<PositionProps> =>
     new Promise((resolve, reject) => {
-        Geolocation.watchPosition(
+        Geolocation.getCurrentPosition(
             position => {
                 const cords: PositionProps = {
                     latitude: position.coords.latitude,
@@ -35,7 +35,6 @@ export const getCurrentPosition = (): Promise<PositionProps> =>
 
 export const getLocationFromAddress = async (address: string) => {
     const data = await Geocoder.from(address);
-
     return data.results[0].geometry.location;
 };
 
@@ -47,3 +46,26 @@ export const getAddressFromLocation = async (
     var addressComponent = data.results[0].formatted_address;
     return addressComponent;
 };
+export const trackingLocation = (): Promise<PositionProps> =>
+    new Promise((resolve, reject) => {
+        Geolocation.watchPosition(
+            position => {
+                const cords: PositionProps = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    heading: position?.coords?.heading,
+                };
+                return resolve(cords);
+            },
+            error => {
+                reject(error.message);
+            },
+            {
+                accuracy: {android: 'high', ios: 'bestForNavigation'},
+                enableHighAccuracy: true,
+                distanceFilter: 100,
+                showLocationDialog: true,
+                forceRequestLocation: true,
+            },
+        );
+    });
