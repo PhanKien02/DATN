@@ -24,44 +24,10 @@ export const MenuItems: MenuItems[] = [
           link: "/",
      },
      {
-          title: "Nhân Viên",
+          title: "Người Dùng",
           id: "QLNV",
-          icon: FaHouseUser,
-          children: [
-               {
-                    key: "1",
-                    label: (
-                         <NavLink
-                              to="/nhan-vien"
-                              className="flex items-center gap-3 !text-blue-600"
-                         >
-                              <FaUserTie /> <span>Nhân Viên</span>
-                         </NavLink>
-                    ),
-               },
-               {
-                    key: "1",
-                    label: (
-                         <NavLink
-                              to="/nhan-vien"
-                              className="flex items-center gap-3 !text-blue-600"
-                         >
-                              <FaCarRear /> <span>Tài Xế</span>
-                         </NavLink>
-                    ),
-               },
-               {
-                    key: "1",
-                    label: (
-                         <NavLink
-                              to="/nhan-vien"
-                              className="flex items-center gap-3 !text-blue-600"
-                         >
-                              <FaUser /> <span>Người Dùng</span>
-                         </NavLink>
-                    ),
-               },
-          ],
+          icon: FaUserTie,
+          link: "/nguoi-dung",
      },
      {
           title: "Đơn Giá",

@@ -2,7 +2,7 @@ import userRepository from "../repositories/userRepository";
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import authorityRepository from "../repositories/authorityRepository";
-import { UserRoles } from "../types/userRoles";
+import { UserRoles } from "../domain/Enums/userRoles";
 
 export const seederUser = async (req: Request, res: Response) => {
     await authorityRepository.bulkCreate([

@@ -19,7 +19,7 @@ const routers: RouteObject[] = [
                     Component: DashboadPage,
                },
                {
-                    path: "/nhan-vien",
+                    path: "/nguoi-dung",
                     id: "staff",
                     Component: UserManagerPage,
                },

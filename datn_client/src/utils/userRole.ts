@@ -1,5 +1,5 @@
-export enum UserRole {
-     MANAGER = "Trưởng Trạm",
-     DEPUTY = "Phó Trạm",
-     STAFF = "Nhân Viên Y Tế",
+export enum UserRoles {
+     ADMIN = "ADMIN",
+     DRIVER = "DRIVER",
+     USER = "USER",
 }
