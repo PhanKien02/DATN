@@ -14,3 +14,7 @@ export const savePrice = (req: AuthenticatedRequest, res: Response) => {
     const result = unitPriceService.saveUnitPrice(user, price);
     return res.status(httpStatus.OK).send(result);
 };
+export const getPrice = async (req: AuthenticatedRequest, res: Response) => {
+    const result = await unitPriceService.getPriceByTime();
+    return res.status(httpStatus.OK).send(result);
+};

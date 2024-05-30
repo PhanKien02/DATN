@@ -8,10 +8,14 @@ import {
     initialWindowMetrics,
 } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {store, useAppDispatch} from './models/root-store/root-store';
+import {store} from './models/root-store/root-store';
 import {Provider} from 'react-redux';
 import {useEffect} from 'react';
-import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import Toast, {
+    BaseToast,
+    ErrorToast,
+    InfoToast,
+} from 'react-native-toast-message';
 import messaging, {
     firebase,
     FirebaseMessagingTypes,
@@ -19,8 +23,7 @@ import messaging, {
 import notifee, {AndroidImportance} from '@notifee/react-native';
 import Firebase from './utils/firebase';
 import {enableScreens} from 'react-native-screens';
-import {setUpRootStore} from './models/root-store/setUp';
-import {SETUP} from './models/auth-slice';
+
 function App() {
     async function requestUserPermission() {
         const authStatus = await messaging().requestPermission();
@@ -124,12 +127,17 @@ function App() {
                             success: props => (
                                 <BaseToast
                                     {...props}
-                                    style={{borderLeftColor: 'green'}}
+                                    style={{
+                                        backgroundColor: 'green',
+                                        borderLeftColor: 'green',
+                                    }}
                                     text1Style={{
                                         fontWeight: 'bold',
+                                        color: '#fff',
                                     }}
                                     text2Style={{
                                         fontSize: 16,
+                                        color: '#fff',
                                     }}
                                     text2NumberOfLines={4}
                                     text1NumberOfLines={4}
@@ -138,12 +146,36 @@ function App() {
                             error: props => (
                                 <ErrorToast
                                     {...props}
-                                    style={{borderLeftColor: 'red'}}
+                                    style={{
+                                        backgroundColor: 'red',
+                                        borderLeftColor: 'red',
+                                    }}
                                     text1Style={{
                                         fontWeight: 'bold',
+                                        color: '#fff',
                                     }}
                                     text2Style={{
                                         fontSize: 16,
+                                        color: '#fff',
+                                    }}
+                                    text2NumberOfLines={4}
+                                    text1NumberOfLines={4}
+                                />
+                            ),
+                            info: props => (
+                                <InfoToast
+                                    {...props}
+                                    style={{
+                                        backgroundColor: '#13e5ed',
+                                        borderLeftColor: '#13e5ed',
+                                    }}
+                                    text1Style={{
+                                        fontWeight: 'bold',
+                                        color: '#fff',
+                                    }}
+                                    text2Style={{
+                                        fontSize: 16,
+                                        color: '#fff',
                                     }}
                                     text2NumberOfLines={4}
                                     text1NumberOfLines={4}
@@ -151,7 +183,7 @@ function App() {
                             ),
                         }}
                         autoHide
-                        visibilityTime={1500}
+                        visibilityTime={3000}
                         position="top"
                     />
                 </SafeAreaProvider>

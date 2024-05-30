@@ -2,11 +2,13 @@ import {configureStore} from '@reduxjs/toolkit';
 import {useDispatch, useSelector} from 'react-redux';
 import {api} from '../../services/api';
 import authSlice from '../auth-slice';
+import bookingSlice from '../booking-slice';
 
 export const store = configureStore({
     reducer: {
         [api.reducerPath]: api.reducer,
         auth: authSlice,
+        boooking: bookingSlice,
     },
     middleware: getDefaultMiddleware =>
         getDefaultMiddleware().concat(api.middleware),

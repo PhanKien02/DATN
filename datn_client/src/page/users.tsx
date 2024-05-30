@@ -14,6 +14,7 @@ import { IoPersonAddSharp } from "react-icons/io5";
 import UserModal from "../modals/userModal";
 import { userService } from "../services/userService";
 import { toast } from "react-toastify";
+import { UserRoles } from "../utils/userRole";
 const UserManagerPage = () => {
      const { Search } = Input;
      const [page, setPage] = useState(1);
@@ -109,12 +110,16 @@ const UserManagerPage = () => {
                },
                filters: [
                     {
-                         text: "Nam",
-                         value: true,
+                         text: "Admin",
+                         value: UserRoles.ADMIN,
                     },
                     {
-                         text: "Nữ",
-                         value: false,
+                         text: "Người Dùng",
+                         value: UserRoles.USER,
+                    },
+                    {
+                         text: "Tài Xế",
+                         value: UserRoles.DRIVER,
                     },
                ],
                onFilter(value, record) {

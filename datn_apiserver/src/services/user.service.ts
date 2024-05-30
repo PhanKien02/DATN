@@ -16,7 +16,7 @@ import wardRepository from "../repositories/wardRepository";
 import districtsRepository from "../repositories/districtsRepository";
 import provinceRepository from "../repositories/provinceRepository";
 import { SubjectEmail } from "../constants/email";
-import { UserRoles } from "../types/userRoles";
+import { UserRoles } from "../domain/Enums/userRoles";
 
 class userService {
     async signUp(newUser: UserPayLoad) {
@@ -76,6 +76,8 @@ class userService {
             login.password,
             user.toJSON().password
         );
+        if (!user.toJSON().activated)
+            throw new BadRequestError("Tài Khoản Của Bạn Đã Bị Khóa");
         if (!checkPassword)
             throw new BadRequestError("Email Hoặc Mật Khẩu Không Chính Xác");
         const token = signToken({

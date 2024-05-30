@@ -8,7 +8,7 @@ import userRouter from "./userRouter";
 import provinceRouter from "./provinceRouter";
 import promotionRouter from "./promotionRouter";
 import unitPriceRouter from "./unitPriceRouter";
-import { veryfyToken } from "../middleware/verifyToken";
+import bookingRouter from "./bookingRouter";
 
 class MasterRouter extends BaseRouter {
     constructor() {
@@ -36,10 +36,10 @@ class MasterRouter extends BaseRouter {
         this.router.use("/authenticate", authLoginRouter);
         this.router.use("/test", testRouter);
         this.router.use("/province", provinceRouter);
-        this.router.use(veryfyToken);
         this.router.use("/users", userRouter);
         this.router.use("/promotion", promotionRouter);
         this.router.use("/price", unitPriceRouter);
+        this.router.use("/booking", bookingRouter);
         this.router.use(errorHandler);
     }
 }

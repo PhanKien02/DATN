@@ -60,5 +60,24 @@ class unitPrice {
     async getAllPrice() {
         return await unitPriceRepository.findAll();
     }
+
+    async getPriceByTime() {
+        const jsDate = new Date();
+        const hours = String(jsDate.getHours()).padStart(2, "0");
+        const minutes = String(jsDate.getMinutes()).padStart(2, "0");
+        const seconds = String(jsDate.getSeconds()).padStart(2, "0");
+        const mytime = `${hours}:${minutes}:${seconds}`;
+
+        return await unitPriceRepository.findOne({
+            where: {
+                timeStart: {
+                    [Op.lte]: mytime,
+                },
+                timeEnd: {
+                    [Op.gte]: mytime,
+                },
+            },
+        });
+    }
 }
 export default new unitPrice();
