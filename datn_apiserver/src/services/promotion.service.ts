@@ -1,7 +1,8 @@
-import { IPromotion } from "../interface/IPromotion";
+import { Op } from "sequelize";
 import promotionRepository from "../repositories/promotionRepository";
 import { BadRequestError } from "../utils/httpErrors";
 import { User } from "../utils/user";
+import { IPromotion } from "../types/Promotion";
 
 class PromotionService {
     async getAllPromotion() {
@@ -42,6 +43,31 @@ class PromotionService {
                     },
                 }
             );
+    }
+    async getPromotionByCondition(km: number) {
+        console.log({ km });
+
+        let promotions = await promotionRepository.findAll({
+            where: {
+                conditionPrice: {
+                    [Op.lte]: km,
+                },
+                status: true,
+                // startDate: {
+                //     [Op.lte]: new Date()
+                //         .toISOString()
+                //         .slice(0, 19)
+                //         .replace("T", " "),
+                // },
+                expDate: {
+                    [Op.gte]: new Date()
+                        .toISOString()
+                        .slice(0, 19)
+                        .replace("T", " "),
+                },
+            },
+        });
+        return promotions;
     }
 }
 export default new PromotionService();

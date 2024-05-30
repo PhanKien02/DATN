@@ -1,10 +1,11 @@
-import {Button, Center, Text, VStack, View} from 'native-base';
+import {Center, FlatList, Input, Text, VStack, View} from 'native-base';
 import {useAppSelector} from '../models/root-store/root-store';
 import SVGLocationIcon from '../components/icons/location';
 import MapView, {
     PROVIDER_GOOGLE,
     Marker,
     AnimatedRegion,
+    Polyline,
 } from 'react-native-maps';
 import {Alert, Dimensions, StyleSheet} from 'react-native';
 import {useEffect, useRef, useState} from 'react';
@@ -13,14 +14,13 @@ import {requestLocationPermission} from '../utils/permissions';
 import {
     getAddressFromLocation,
     getCurrentPosition,
-    getLocationFromAddress,
+    getDirections,
 } from '../utils/location';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import MapViewDirections from 'react-native-maps-directions';
-import {useCaculateDistanceMutation} from '../services/api';
-import Toast from 'react-native-toast-message';
-import {Loading} from '../components/Loading';
+import {BookingModal} from '../components/modal/bookingModal';
+import {useDebouncedEffect} from '../utils/useDebouncedEffect';
+import {useGetLocationFromAddressMutation} from '../services/api';
 interface PositionProps {
     latitude?: number;
     longitude?: number;
@@ -38,28 +38,40 @@ const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export const HomeScreen = () => {
     const user = useAppSelector(state => state.auth);
-    const [caculateDistance] = useCaculateDistanceMutation();
     const mapRef = useRef(null);
-    const departureAddressPlacesRef = useRef(null);
-    const destinationRegionPlacesRef = useRef(null);
     const [departureAddress, setDepartureAddress] = useState('');
     const [destinationAddress, setDestinationAddress] = useState('');
     const [departureRegion, setDepartureRegion] = useState<PositionProps>({});
     const [destinationRegion, setDestinationRegion] = useState<PositionProps>(
         {},
     );
+    const [getLocation] = useGetLocationFromAddressMutation();
+    const [dataRoute, setDataRoute] = useState<{
+        poylines: {
+            latitude: number;
+            longitude: number;
+        }[];
+        distance: string;
+        duration: string;
+    }>({
+        poylines: [],
+        distance: '',
+        duration: '',
+    });
     const getLiveLocation = async () => {
         const locPermissionDenied = await requestLocationPermission();
         if (locPermissionDenied.success) {
-            const {latitude, longitude, heading} = await getCurrentPosition();
+            const {latitude, longitude} = await getCurrentPosition();
             new AnimatedRegion({latitude, longitude});
             setDepartureRegion({
                 latitude: latitude,
                 longitude: longitude,
             });
-            getAddressFromLocation(latitude, longitude).then(result => {
-                setDepartureAddress(result);
-            });
+
+            // getAddressFromLocation(latitude, longitude).then(result => {
+            //     console.log({result});
+            //     setDepartureAddress(result);
+            // });
         } else {
             Alert.alert(
                 '',
@@ -68,63 +80,46 @@ export const HomeScreen = () => {
             );
         }
     };
-    const handleSearchDepartureAddress = (value: string) => {
-        if (value)
-            requestLocationPermission().then(result => {
-                if (result.success)
-                    getLocationFromAddress(value.trim()).then(({lat, lng}) => {
-                        setDepartureRegion({
-                            latitude: lat,
-                            longitude: lng,
-                            description: value,
-                        });
-                    });
-                else {
-                    Alert.alert(
-                        '',
-                        'Driver Service yêu cầu quyền truy cập vị trí của bạn',
-                        [
-                            {text: 'Ok'},
-                            {text: 'Cài đặt', onPress: openSettings},
-                        ],
-                    );
-                }
-            });
-    };
-    const handleSearchDestinationAddress = (value: string) => {
-        if (value)
-            requestLocationPermission().then(result => {
-                if (result.success)
-                    getLocationFromAddress(value.trim()).then(({lat, lng}) => {
-                        setDestinationRegion({
-                            latitude: lat,
-                            longitude: lng,
-                            description: value,
-                        });
-                    });
-                else {
-                    Alert.alert(
-                        '',
-                        'Driver Service yêu cầu quyền truy cập vị trí của bạn',
-                        [
-                            {text: 'Ok'},
-                            {text: 'Cài đặt', onPress: openSettings},
-                        ],
-                    );
-                }
-            });
-    };
-    const handleSearchDriver = () => {
-        if (!departureAddress || !destinationAddress)
-            return Toast.show({
-                type: 'error',
-                text2: 'Vui Lòng Nhập Điểm Đi Và Điểm Đến',
-            });
-    };
     useEffect(() => {
         if (!departureRegion.latitude || !departureRegion.longitude)
             getLiveLocation();
-    }, [departureRegion.latitude, departureRegion.longitude]);
+    }, []);
+    useDebouncedEffect(
+        () =>
+            getDirections(departureAddress, destinationAddress).then(data => {
+                setDataRoute(data);
+            }),
+        [departureAddress, destinationAddress],
+        500,
+    );
+    useDebouncedEffect(
+        () =>
+            departureAddress &&
+            destinationAddress &&
+            getLocation({departureAddress})
+                .then(response => {
+                    console.log({departureLocation: response.data});
+                })
+                .catch(Err => {
+                    console.log({Err});
+                }),
+        [departureAddress],
+        300,
+    );
+    useDebouncedEffect(
+        () =>
+            departureAddress &&
+            destinationAddress &&
+            getLocation({destinationAddress})
+                .then(response => {
+                    console.log({destinationAddress: response.data});
+                })
+                .catch(Err => {
+                    console.log({Err});
+                }),
+        [destinationAddress],
+        300,
+    );
 
     useEffect(() => {
         if (mapRef.current) {
@@ -146,49 +141,12 @@ export const HomeScreen = () => {
             );
         }
     }, [departureRegion, destinationRegion]);
-    useEffect(() => {
-        if (departureAddressPlacesRef.current) {
-            departureAddressPlacesRef.current.setAddressText(departureAddress);
-        }
-    }, [departureAddress]);
-    useEffect(() => {
-        if (destinationRegionPlacesRef.current) {
-            destinationRegionPlacesRef.current.setAddressText(
-                destinationAddress,
-            );
-        }
-    }, [destinationAddress]);
-    useEffect(() => {
-        getAddressFromLocation(
-            departureRegion.latitude,
-            departureRegion.longitude,
-        ).then(res => setDepartureAddress(res));
-    }, [departureRegion]);
-    useEffect(() => {
-        getAddressFromLocation(
-            destinationRegion.latitude,
-            destinationRegion.longitude,
-        ).then(res => setDestinationAddress(res));
-    }, [destinationRegion]);
-    useEffect(() => {
-        departureAddress &&
-            destinationAddress &&
-            caculateDistance({departureAddress, destinationAddress}).then(
-                res => {
-                    console.log(
-                        'data',
-                        res.data.rows[0].elements[0].distance.value,
-                    );
-                },
-            );
-    }, [departureAddress, destinationAddress]);
-    console.log({
-        departureRegion,
-        departureAddress,
-        destinationRegion,
-        destinationAddress,
-    });
-
+    // console.log({
+    //     departureRegion,
+    //     departureAddress,
+    //     destinationRegion,
+    //     destinationAddress,
+    // });
     return (
         <>
             <View w="100%" h="72" margin={0}>
@@ -203,19 +161,19 @@ export const HomeScreen = () => {
                         Xin Chào
                     </Text>
                     <Text ml={10} mt={1} fontWeight="bold" color="white">
-                        {user?.user.fullName}
+                        {user?.user?.fullName || ''}
                     </Text>
                 </View>
                 <Center>
                     <VStack
                         w="95%"
-                        paddingBottom="10%"
+                        paddingBottom="5%"
                         backgroundColor="white"
                         borderRadius={20}
-                        mb={50}
                         style={{
                             position: 'absolute',
                             top: -150,
+                            zIndex: 20,
                             shadowColor: '#000',
                             shadowOffset: {
                                 width: 0,
@@ -225,39 +183,38 @@ export const HomeScreen = () => {
                             shadowRadius: 15.0,
                             elevation: 6,
                         }}>
-                        <View ml={4} fontWeight="bold" flexDir="row" w="90%">
+                        <View
+                            ml={4}
+                            mt={4}
+                            fontWeight="bold"
+                            flexDir="row"
+                            w="90%">
                             <View zIndex={1}>
                                 <SVGLocationIcon />
                             </View>
-                            <GooglePlacesAutocomplete
-                                placeholder="Điểm Đón"
-                                onPress={data => {
-                                    handleSearchDepartureAddress(
-                                        data.description,
-                                    );
-                                }}
-                                ref={departureAddressPlacesRef}
-                                query={{
-                                    key: API_GG_MAP_KEY,
-                                    language: 'vn',
-                                    components: 'country:vn',
-                                }}
-                                currentLocation={true}
-                                nearbyPlacesAPI="GooglePlacesSearch"
-                                debounce={300}
-                                styles={{
-                                    listView: {
-                                        height: '100%',
-                                        overflow: 'scroll',
-                                        marginLeft: -50,
-                                        position: 'relative',
-                                        left: 10,
-                                    },
-                                    container: {
-                                        marginLeft: -20,
-                                    },
-                                }}
-                            />
+                            <VStack>
+                                <Input
+                                    w="64"
+                                    borderRadius={30}
+                                    placeholder="Điểm Đón"
+                                    value={departureAddress}
+                                    onChangeText={setDepartureAddress}
+                                />
+                                <FlatList
+                                    data={[]}
+                                    renderItem={item => (
+                                        <Text>{item.item}</Text>
+                                    )}
+                                    w="full"
+                                    style={{
+                                        position: 'absolute',
+                                        top: 50,
+                                        zIndex: 40,
+                                        backgroundColor: '#F43',
+                                        borderRadius: 7,
+                                    }}
+                                />
+                            </VStack>
                         </View>
                         <View
                             ml={4}
@@ -268,54 +225,42 @@ export const HomeScreen = () => {
                             <View zIndex={1}>
                                 <SVGLocationIcon color={'#f43'} />
                             </View>
-                            <GooglePlacesAutocomplete
-                                placeholder="Điểm Đến"
-                                onPress={data => {
-                                    handleSearchDestinationAddress(
-                                        data.description,
-                                    );
-                                }}
-                                query={{
-                                    key: API_GG_MAP_KEY,
-                                    language: 'vn',
-                                    components: 'country:vn',
-                                }}
-                                ref={destinationRegionPlacesRef}
-                                currentLocation={true}
-                                currentLocationLabel="Điểm Đến"
-                                debounce={300}
-                                styles={{
-                                    listView: {
-                                        height: '100%',
-                                        overflow: 'scroll',
-                                        marginLeft: -50,
-                                        position: 'relative',
-                                        left: 10,
-                                    },
-                                    container: {
-                                        marginLeft: -20,
-                                    },
-                                }}
-                            />
+                            <VStack>
+                                <Input
+                                    w="64"
+                                    borderRadius={30}
+                                    placeholder="Điểm Đến"
+                                    value={destinationAddress}
+                                    onChangeText={setDestinationAddress}
+                                />
+                                <FlatList
+                                    data={[]}
+                                    renderItem={item => (
+                                        <Text>{item.item}</Text>
+                                    )}
+                                    w="full"
+                                    style={{
+                                        position: 'absolute',
+                                        top: 50,
+                                        zIndex: 40,
+                                        backgroundColor: '#F43',
+                                        borderRadius: 7,
+                                    }}
+                                />
+                            </VStack>
                         </View>
                     </VStack>
                 </Center>
             </View>
             <Center w="100%">
-                <View
-                    w="95%"
-                    h="full"
-                    style={{
-                        position: 'relative',
-                        zIndex: 10,
-                    }}>
+                <View w="95%" h="full">
                     <View
                         w="full"
-                        h="54%"
+                        h="62%"
                         style={{
                             position: 'absolute',
                             left: 0,
-                            top: 0,
+                            top: -50,
                             zIndex: 12,
                         }}>
                         <MapView
@@ -327,6 +272,12 @@ export const HomeScreen = () => {
                                 setDestinationRegion({
                                     latitude: coordinate.latitude,
                                     longitude: coordinate.longitude,
+                                });
+                                getAddressFromLocation(
+                                    coordinate.latitude,
+                                    coordinate.longitude,
+                                ).then(result => {
+                                    setDestinationAddress(result);
                                 });
                             }}
                             showsUserLocation
@@ -412,6 +363,13 @@ export const HomeScreen = () => {
                                         optimizeWaypoints={true}
                                     />
                                 )}
+                            {dataRoute.poylines.length > 0 && (
+                                <Polyline
+                                    coordinates={dataRoute.poylines}
+                                    strokeColor="red"
+                                    strokeWidth={3}
+                                />
+                            )}
                         </MapView>
                         <Center
                             style={{
@@ -419,11 +377,12 @@ export const HomeScreen = () => {
                                 width: '100%',
                                 bottom: 0,
                             }}>
-                            <Button
-                                onPress={handleSearchDriver}
-                                borderRadius={20}>
-                                Tìm Kiếm Tài Xế
-                            </Button>
+                            <BookingModal
+                                customerId={user?.user?.id}
+                                origin={'departureAddress'}
+                                destination={'destinationAddress'}
+                                distance={7}
+                            />
                         </Center>
                     </View>
                 </View>

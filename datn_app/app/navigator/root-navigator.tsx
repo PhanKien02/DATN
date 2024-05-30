@@ -83,7 +83,6 @@ const NaviagaterContainer = () => {
             navigationRef?.current?.navigate(screens.home);
         } else setInitScreen(screens.start);
     }, [role]);
-    console.log({user});
     return (
         <NavigationContainer ref={navigationRef}>
             <RootStack initScreen={initScreen} />

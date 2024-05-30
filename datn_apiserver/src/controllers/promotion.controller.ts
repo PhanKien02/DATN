@@ -35,3 +35,11 @@ export const blockOrActivePromotion = async (
     );
     res.status(httpStatus.OK).send(result);
 };
+export const getPromotionByCondition = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const km = req.query.km;
+    const result = await promotionService.getPromotionByCondition(+km);
+    res.status(httpStatus.OK).send(result);
+};
