@@ -1,9 +1,13 @@
+import { Op } from "sequelize";
 import { database } from "../configs/database";
 import { BookingStatus } from "../domain/Enums/booking";
 import bookingRepository from "../repositories/bookingRepository";
 import invoiceRepository from "../repositories/invoiceRepository";
 import { BookingPayLoad } from "../types/booking";
 import { BadRequestError } from "../utils/httpErrors";
+import userRepository from "../repositories/userRepository";
+import unitPriceRepository from "../repositories/unitPriceRepository";
+import promotionRepository from "../repositories/promotionRepository";
 
 class BookingService {
     async booking(booking: BookingPayLoad) {
@@ -49,6 +53,46 @@ class BookingService {
                     },
                 }
             );
+    }
+
+    async getAllBooking(page: number, limit: number, search?: string) {
+        const query = {};
+        if (search)
+            query["where"] = {
+                [Op.or]: [
+                    {
+                        fullName: {
+                            [Op.like]: `%${search}%`,
+                        },
+                    },
+                    {
+                        email: {
+                            [Op.like]: `%${search}%`,
+                        },
+                    },
+                ],
+            };
+        query["limit"] = limit;
+        query["offset"] = (page - 1) * limit;
+        const { rows, count } = await bookingRepository.findAndCountAll({
+            ...query,
+            include: [
+                {
+                    model: userRepository,
+                    association: "customer",
+                    as: "customer",
+                },
+                unitPriceRepository,
+                promotionRepository,
+            ],
+        });
+
+        return {
+            bookings: rows,
+            limit: limit,
+            page: page,
+            totalPage: Math.ceil(count / limit),
+        };
     }
 }
 export default new BookingService();

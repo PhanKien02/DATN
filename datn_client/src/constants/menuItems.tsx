@@ -1,11 +1,8 @@
 import { IconType } from "react-icons";
 import { FaHome } from "react-icons/fa";
-import { FaHouseUser } from "react-icons/fa";
 import type { MenuProps } from "antd";
-import { NavLink } from "react-router-dom";
-import { FaCarRear } from "react-icons/fa6";
+import { FaCar } from "react-icons/fa";
 import { FaUserTie } from "react-icons/fa6";
-import { FaUser } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
 import { FaFileInvoiceDollar } from "react-icons/fa";
 import { MdPriceCheck } from "react-icons/md";
@@ -22,6 +19,12 @@ export const MenuItems: MenuItems[] = [
           icon: FaHome,
           id: "index",
           link: "/",
+     },
+     {
+          title: "Danh Sách Đơn Hàng",
+          link: "/don-hang",
+          id: "booking",
+          icon: FaCar,
      },
      {
           title: "Người Dùng",
@@ -41,6 +44,7 @@ export const MenuItems: MenuItems[] = [
           id: "promotion",
           icon: MdDiscount,
      },
+
      {
           title: "Hóa Đơn",
           link: "###",

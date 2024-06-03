@@ -5,9 +5,19 @@ import bookingService from "../services/booking.service";
 
 export const booking = async (req: AuthenticatedRequest, res: Response) => {
     const booking = req.body.payload;
-    console.log(req.body);
 
     const result = await bookingService.booking(booking);
+    return res.status(httpStatus.OK).send(result);
+};
+export const getAllbooking = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const limit = req.query.limit ?? 10;
+    const page = req.query.page ?? 1;
+    const search = req.query.search as string;
+
+    const result = await bookingService.getAllBooking(+page, +limit, search);
     return res.status(httpStatus.OK).send(result);
 };
 
@@ -24,3 +34,4 @@ export const cancelBooking = async (
     );
     return res.status(httpStatus.OK).send(result);
 };
+9;

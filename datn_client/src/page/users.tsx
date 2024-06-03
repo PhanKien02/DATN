@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGetAllUsers from "../hook/useGetUser";
-import { Button, Spin } from "antd";
+import { Button, Spin, Tabs } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { IUser } from "../models/user.model";
 import { Pagination } from "antd";
@@ -219,24 +219,41 @@ const UserManagerPage = () => {
                               style={{ width: 400 }}
                               size="large"
                          />
-                         <Table
-                              className="h-full w-full mt-6"
-                              columns={columns}
-                              dataSource={users.users}
-                              pagination={false}
-                         />
-                         <Pagination
-                              className="!mr-5 !mt-10"
-                              showSizeChanger
-                              defaultCurrent={page}
-                              pageSize={limit}
-                              total={users.totalPage}
-                              onChange={(current, pageSize) => {
-                                   setPage(current);
-                                   setLimit(pageSize);
-                              }}
-                         />
                     </div>
+                    <Tabs
+                         type="card"
+                         items={Object.values(UserRoles).map((role) => {
+                              return {
+                                   label: role,
+                                   key: role,
+                                   children: (
+                                        <>
+                                             <Table
+                                                  columns={columns}
+                                                  dataSource={users.users.filter(
+                                                       (us) => us.role === role
+                                                  )}
+                                                  pagination={false}
+                                             />
+                                             {/* <Pagination
+                                                       className="!mr-5 !mt-10"
+                                                       showSizeChanger
+                                                       defaultCurrent={page}
+                                                       pageSize={limit}
+                                                       total={users.totalPage}
+                                                       onChange={(
+                                                            current,
+                                                            pageSize
+                                                       ) => {
+                                                            setPage(current);
+                                                            setLimit(pageSize);
+                                                       }}
+                                                  /> */}
+                                        </>
+                                   ),
+                              };
+                         })}
+                    />
                </div>
           </>
      );

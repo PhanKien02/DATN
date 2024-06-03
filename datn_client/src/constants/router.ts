@@ -1,4 +1,5 @@
 import MainLayout from "../layouts/mainLayout";
+import BookingManagerPage from "../page/booking";
 import DashboadPage from "../page/dashboad";
 import { LoginPage } from "../page/login";
 import PromotionManagerPage from "../page/promotion";
@@ -32,6 +33,11 @@ const routers: RouteObject[] = [
                     path: "/don-gia",
                     id: "unitPrice",
                     Component: UnitPriceManagerPage,
+               },
+               {
+                    path: "/don-hang",
+                    id: "booking",
+                    Component: BookingManagerPage,
                },
           ],
      },
