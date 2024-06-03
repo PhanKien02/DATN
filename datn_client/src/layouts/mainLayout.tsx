@@ -4,12 +4,19 @@ import { useAuthContext } from "../contexts/authContext";
 import { MenuItems } from "../constants/menuItems";
 import HeaderComponent from "../page/header";
 import { DownOutlined } from "@ant-design/icons";
+import { onMessageListener } from "../utils/firebase/firebaseConfigs";
+import { useState } from "react";
 const { Header, Content, Sider } = Layout;
 
 const MainLayout = () => {
+     const [notification, setNotification] = useState({ title: "", body: "" });
      const { userLogin } = useAuthContext();
      if (!userLogin) return <Navigate to="/login" />;
-
+     onMessageListener()
+          .then((payload) => {
+               console.log(payload);
+          })
+          .catch((err) => console.log("failed: ", err));
      return (
           <Layout className="fixed top-0 left-0 right-0 bottom-0">
                <Sider
@@ -43,6 +50,7 @@ const MainLayout = () => {
                                                   menu={{
                                                        items: menu.children,
                                                   }}
+                                                  key={menu.id}
                                              >
                                                   <a
                                                        onClick={(e) =>
@@ -68,6 +76,7 @@ const MainLayout = () => {
                                              <NavLink
                                                   to={menu.link ?? ""}
                                                   className="flex justify-start items-center gap-3 "
+                                                  key={menu.id}
                                              >
                                                   {menu.icon ? (
                                                        <span>

@@ -1,9 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
+import { getMessaging, onMessage } from "firebase/messaging";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -15,13 +15,20 @@ const firebaseConfig = {
      projectId: "datn-44ee0",
      storageBucket: "datn-44ee0.appspot.com",
      messagingSenderId: "714857124227",
-     appId: "1:714857124227:web:ef977615533e71bf5fa6b6",
-     measurementId: "G-JFZLGDL5SF",
+     appId: "1:714857124227:web:a0f3b47af4d4ba9d5fa6b6",
+     measurementId: "G-JGNP3MRDT4",
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
+export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth();
 export const storage = getStorage(app);
+export const messaging = getMessaging(app);
+export const onMessageListener = () =>
+     new Promise((resolve) => {
+          onMessage(messaging, (payload) => {
+               console.log("payload", payload);
+               resolve(payload);
+          });
+     });
