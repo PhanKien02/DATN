@@ -4,7 +4,7 @@ import { IPromotion } from "./promotion";
 import { IUser } from "./user.model";
 
 export interface IBooking {
-     id?: number;
+     id: number;
 
      date: Date;
 
@@ -20,9 +20,13 @@ export interface IBooking {
 
      paymentStatus: boolean;
 
-     pick_up_point: string;
+     originAddress: string;
 
-     dropOffPoint: string;
+     originlongitude: number;
+
+     originLatitude: number;
+
+     destinationAddress: string;
 
      vehicleReceiptImage?: Image[];
 
@@ -38,12 +42,24 @@ export interface IBooking {
 }
 export interface BookingPayLoad {
      customerId: number;
-     pick_up_point: string;
-     dropOffPoint: string;
+
+     originAddress: string;
+
+     originlongitude: number;
+
+     originLatitude: number;
+
+     destinationAddress: string;
+
      paymentStatus: boolean;
+
      totalPayment: number;
+
      longDistance: number;
+
+     promotionId: number;
+
      paymentMethod: string;
-     promotionId?: number;
+
      unitPriceId: number;
 }

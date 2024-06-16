@@ -9,5 +9,15 @@ class BookingService {
           });
           return response.data;
      }
+
+     async cancelBooking(id: number, cancelReason: string) {
+          await baseRequest.get(this.BasseUrl + "cancel", {
+               params: { id, cancelReason },
+          });
+     }
+
+     async assignDriver(id: number, driver: number) {
+          await baseRequest.put(this.BasseUrl + "assign", { id, driver });
+     }
 }
 export default new BookingService();

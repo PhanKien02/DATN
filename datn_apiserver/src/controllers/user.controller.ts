@@ -22,10 +22,8 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const getAllUser = async (req: AuthenticatedRequest, res: Response) => {
-    const limit = req.query.limit ?? 10;
-    const page = req.query.page ?? 1;
     const search = req.query.search as string;
-    const result = await userService.getAllUser(+limit, +page, search);
+    const result = await userService.getAllUser(search);
 
     return res.status(httpStatus.OK).send(result);
 };
@@ -63,5 +61,14 @@ export const verifyAccout = async (
 export const resendEmail = async (req: AuthenticatedRequest, res: Response) => {
     const email = req.query.email as string;
     const response = await userService.resendActive(email);
+    return res.status(httpStatus.OK).send(response);
+};
+
+export const searchDrivingAround = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const { lat, long } = req.query;
+    const response = await userService.searchDrivingAround(+lat, +long);
     return res.status(httpStatus.OK).send(response);
 };

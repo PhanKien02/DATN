@@ -18,9 +18,15 @@ export interface IBooking {
 
     paymentStatus: boolean;
 
-    pick_up_point: string;
+    originLocaition: number;
 
-    dropOffPoint: string;
+    originAddress: string;
+
+    originlongitude: number;
+
+    originLatitude: number;
+
+    destinationAddress: string;
 
     vehicleReceiptImage?: Image[];
 
@@ -29,13 +35,21 @@ export interface IBooking {
     customerId: number;
 
     promotionId: number;
+
+    destinationLatitude: number;
+
+    destinationLongitude: number;
 }
 export interface BookingPayLoad {
     customerId: number;
 
-    pick_up_point: string;
+    originAddress: string;
 
-    dropOffPoint: string;
+    originlongitude: number;
+
+    originLatitude: number;
+
+    destinationAddress: string;
 
     paymentStatus: boolean;
 
@@ -48,4 +62,7 @@ export interface BookingPayLoad {
     paymentMethod: string;
 
     unitPriceId: number;
+    destinationLatitude: number;
+
+    destinationLongitude: number;
 }

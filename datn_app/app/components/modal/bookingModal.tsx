@@ -16,7 +16,6 @@ import {
 } from '../../services/api';
 import {IPromotion} from '../../interface/promotion';
 import {FindDriverModal} from './findDriverModal';
-import Toast from 'react-native-toast-message';
 import {IPrice} from '../../interface/price';
 import {BookingPayLoad} from '../../interface/booking';
 import {Loading} from '../Loading';
@@ -26,14 +25,22 @@ import {save} from '../../utils/storage';
 import {KeyAsyncStorage} from '../../constants/asyncStorage';
 interface Props {
     customerId: number;
-    origin: string;
-    destination: string;
+    originAddress: string;
+    destinationAddress: string;
+    originlongitude: number;
+    destinationLongitude: number;
+    originLatitude: number;
+    destinationLatitude: number;
     distance: number;
 }
 export const BookingModal = ({
-    origin,
-    destination,
+    originAddress,
+    destinationAddress,
     distance,
+    originLatitude,
+    originlongitude,
+    destinationLatitude,
+    destinationLongitude,
     customerId,
 }: Props) => {
     const dispath = useAppDispatch();
@@ -48,7 +55,7 @@ export const BookingModal = ({
     const [promotionId, setPromotionId] = useState<number | undefined>();
     const [errMes, setErrorMes] = useState('');
     const {data: dataPromotion, refetch: refetchPromotion} =
-        useGetPromotionQuery({km: distance});
+        useGetPromotionQuery({km: distance / 1000});
     const {data: dataPrice, refetch: refectPrice} = useGetPriceQuery({});
     const promotions = useMemo(() => {
         if (Array.isArray(dataPromotion))
@@ -70,7 +77,7 @@ export const BookingModal = ({
     }, [showModal]);
     useEffect(() => {
         if (prince && prince.presentPrice)
-            showModal && setTotal(distance * prince.presentPrice);
+            showModal && setTotal((distance / 1000) * prince.presentPrice);
         else setTotal(0);
     }, [dataPrice, showModal]);
     useEffect(() => {
@@ -81,14 +88,18 @@ export const BookingModal = ({
     const handleBooking = () => {
         const payload: BookingPayLoad = {
             customerId: customerId,
-            pick_up_point: origin,
-            dropOffPoint: destination,
+            originAddress: originAddress,
+            destinationAddress: destinationAddress,
             paymentStatus: paymentStatus,
             totalPayment: totalPayment,
-            longDistance: distance,
+            longDistance: distance / 1000,
             paymentMethod: paymentMethod,
             promotionId: promotionId,
             unitPriceId: prince.id,
+            originLatitude: originLatitude,
+            originlongitude: originlongitude,
+            destinationLatitude: destinationLatitude,
+            destinationLongitude: destinationLongitude,
         };
         booking({payload})
             .unwrap()
@@ -117,6 +128,7 @@ export const BookingModal = ({
             promotion && promotion.value && setDiscount(promotion.value);
         }
     }, [promotionId]);
+
     return (
         <>
             <Center>
@@ -137,13 +149,16 @@ export const BookingModal = ({
                         <Modal.Header>Đơn Hàng</Modal.Header>
                         <Modal.Body>
                             <View>
-                                <View justifyContent="start">
+                                <View
+                                    style={{
+                                        display: 'flex',
+                                    }}>
                                     <Text fontWeight="bold">Điểm Đón:</Text>
-                                    <Text ml={5}>{origin}</Text>
+                                    <Text ml={5}>{originAddress}</Text>
                                 </View>
                                 <View justifyContent="start">
                                     <Text fontWeight="bold">Điểm Đến:</Text>
-                                    <Text ml={5}>{destination}</Text>
+                                    <Text ml={5}>{destinationAddress}</Text>
                                 </View>
                             </View>
                             <View>
@@ -158,7 +173,7 @@ export const BookingModal = ({
                                         defaultValue={discount.toString()}>
                                         <Select.Item
                                             label={'Không Dùng Phiếu Giảm Giá'}
-                                            value={'0'}
+                                            value={undefined}
                                         />
                                         {promotions.map(promotion => {
                                             return (
@@ -202,7 +217,12 @@ export const BookingModal = ({
                                     w="90%"
                                     direction="row">
                                     <Text fontWeight="bold">Tổng Tiền : </Text>
-                                    <Text>{total} VNĐ</Text>
+                                    <Text>
+                                        {total.toLocaleString('vi-VN', {
+                                            currency: 'VND',
+                                        })}{' '}
+                                        VNĐ
+                                    </Text>
                                 </Flex>
                                 <Flex
                                     ml={2}
@@ -224,7 +244,12 @@ export const BookingModal = ({
                                     w="90%"
                                     direction="row">
                                     <Text fontWeight="bold">Tổng Thu : </Text>
-                                    <Text>{totalPayment} VNĐ</Text>
+                                    <Text>
+                                        {totalPayment.toLocaleString('vi-VN', {
+                                            currency: 'VND',
+                                        })}
+                                        VNĐ
+                                    </Text>
                                 </Flex>
                                 <Flex
                                     ml={2}

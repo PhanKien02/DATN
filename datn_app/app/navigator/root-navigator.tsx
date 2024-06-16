@@ -1,6 +1,6 @@
 import StartScreen from '../screens/start-screen';
-import React, {createRef, useEffect, useRef, useState} from 'react';
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
+import React, {useEffect, useRef, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LoginScreen from '../screens/login-screen';
 import {screens} from './screenName';
@@ -16,6 +16,7 @@ import {UserRoles} from '../models/enums/userRoles';
 import {DriverTab} from './driver-navigator';
 import {setUpRootStore} from '../models/root-store/setUp';
 import {SETUP} from '../models/auth-slice';
+import {Loading} from '../components/Loading';
 const Stack = createNativeStackNavigator();
 const RootStack = ({initScreen}) => {
     return (
@@ -73,6 +74,7 @@ const NaviagaterContainer = () => {
     const navigationRef = useRef(null);
     const {user} = useAppSelector((state: RootState) => state.auth);
     const role = user?.roleName;
+
     const [initScreen, setInitScreen] = useState('');
     useEffect(() => {
         if (role === UserRoles.DRIVER) {
@@ -83,17 +85,21 @@ const NaviagaterContainer = () => {
             navigationRef?.current?.navigate(screens.home);
         } else setInitScreen(screens.start);
     }, [role]);
-    return (
+    return navigationRef && initScreen ? (
         <NavigationContainer ref={navigationRef}>
             <RootStack initScreen={initScreen} />
         </NavigationContainer>
+    ) : (
+        <Loading />
     );
 };
 export const RootNavigator = () => {
     const dispatch = useAppDispatch();
     useEffect(() => {
         setUpRootStore()
-            .then(({user, token}) => dispatch(SETUP({user, token})))
+            .then(({user, token}) => {
+                user && token && dispatch(SETUP({user, token}));
+            })
             .catch(er => {
                 console.log('Error', er);
             });

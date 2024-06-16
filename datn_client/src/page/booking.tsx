@@ -1,15 +1,19 @@
-import { Pagination, PaginationProps, Spin } from "antd";
+import { Button, Pagination, PaginationProps, Spin } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { useState } from "react";
 import useGetAllBooking from "../hook/useGetAllBooking";
 import { IBooking } from "../models/booking";
 import { formatDateTime } from "../utils/formatDate";
+import { BookingStatus } from "../constants/booking";
+import { MdAssignmentInd } from "react-icons/md";
+import AssignDriverModal from "../modals/assignDriverModal";
 
-// import { toast } from "react-toastify";
 const BookingManagerPage = () => {
      const [limit, setLimit] = useState(10);
+     const [openAssignDriverModal, setOpenAssignDriverModal] = useState(false);
+     const [data, setData] = useState<IBooking>();
      const [page, setPage] = useState(1);
-     const { bookings, isLoading } = useGetAllBooking(page, limit);
+     const { bookings, isLoading, refetch } = useGetAllBooking(page, limit);
      const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
           current,
           pageSize
@@ -41,13 +45,18 @@ const BookingManagerPage = () => {
           },
           {
                title: "Điểm Đón",
-               dataIndex: "pick_up_point",
-               key: "pick_up_point",
+               dataIndex: "originAddress",
+               key: "originAddress",
           },
           {
                title: "Điểm Đến",
-               dataIndex: "dropOffPoint",
-               key: "dropOffPoint",
+               dataIndex: "destinationAddress",
+               key: "destinationAddress",
+          },
+          {
+               title: "Quãng Đường (Km)",
+               dataIndex: "longDistance",
+               key: "longDistance",
           },
           {
                title: "Ngày Giờ",
@@ -58,9 +67,15 @@ const BookingManagerPage = () => {
                },
           },
           {
-               title: "Tổng Tiền",
+               title: "Thanh Toán",
                dataIndex: "totalPayment",
                key: "totalPayment",
+               render: (_, record) => {
+                    return record.totalPayment.toLocaleString("vi-VN", {
+                         style: "currency",
+                         currency: "VND",
+                    });
+               },
           },
           {
                title: "Giảm giá",
@@ -87,12 +102,51 @@ const BookingManagerPage = () => {
                dataIndex: "statused",
                key: "statused",
                fixed: "right",
+               filters: Object.values(BookingStatus).map((status) => {
+                    return {
+                         text: status,
+                         value: status,
+                    };
+               }),
+               onFilter(value, record) {
+                    return record.statused === value;
+               },
+               render: (_, record) => {
+                    return record.statused ? <p>{record.statused}</p> : "N/A";
+               },
           },
           {
                title: "Tính năng",
                key: "operation",
                fixed: "right",
                width: 100,
+               render: (_, record) => {
+                    return (
+                         <>
+                              <Button
+                                   type="primary"
+                                   onClick={() => {
+                                        setOpenAssignDriverModal(true);
+                                        setData(record);
+                                   }}
+                                   disabled={
+                                        record.statused ===
+                                             BookingStatus.FIND_DRIVER ||
+                                        record.statused ===
+                                             BookingStatus.DRIVER_REJECT
+                                             ? false
+                                             : true
+                                   }
+                                   className="!flex items-center justify-center gap-4!mr-5 !bg-green-500"
+                              >
+                                   <span className="mr-1 text-md">
+                                        <MdAssignmentInd />
+                                   </span>
+                                   <span>Tài Xế</span>
+                              </Button>
+                         </>
+                    );
+               },
           },
      ];
      return (
@@ -123,6 +177,14 @@ const BookingManagerPage = () => {
                          />
                     </div>
                </div>
+               {data && (
+                    <AssignDriverModal
+                         refetch={refetch}
+                         data={data}
+                         open={openAssignDriverModal}
+                         setOpen={setOpenAssignDriverModal}
+                    />
+               )}
           </>
      );
 };

@@ -5,8 +5,8 @@ import bookingService from "../services/booking.service";
 
 export const booking = async (req: AuthenticatedRequest, res: Response) => {
     const booking = req.body.payload;
-
-    const result = await bookingService.booking(booking);
+    const user = req.user;
+    const result = await bookingService.booking(user, booking);
     return res.status(httpStatus.OK).send(result);
 };
 export const getAllbooking = async (
@@ -26,12 +26,51 @@ export const cancelBooking = async (
     res: Response
 ) => {
     const { id, cancelReason } = req.query;
-    console.log(req.query);
+    const user = req.user;
 
     const result = await bookingService.cacelBooking(
+        user,
         +id,
         cancelReason.toString()
     );
     return res.status(httpStatus.OK).send(result);
 };
-9;
+
+export const assignDriver = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const { id, driver } = req.body;
+    await bookingService.assignDriver(id, driver);
+    return res.status(httpStatus.OK).send();
+};
+
+export const rejectBooking = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const { bookingId, driverId } = req.body;
+    await bookingService.rejectBooking(bookingId, driverId);
+    return res.status(httpStatus.OK).send();
+};
+
+export const getBookingById = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const { bookingId } = req.query;
+    console.log("query", req.query);
+
+    const response = await bookingService.getBookingById(+bookingId);
+    return res.status(httpStatus.OK).send(response);
+};
+export const acceptBooking = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const { bookingId, driverId } = req.body;
+    console.log({ bookingId, driverId });
+
+    await bookingService.acceptBooking(+bookingId, driverId);
+    return res.status(httpStatus.OK).send();
+};

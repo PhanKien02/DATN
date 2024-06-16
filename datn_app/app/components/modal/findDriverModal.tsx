@@ -3,7 +3,6 @@ import {Loading} from '../Loading';
 import {useEffect, useState} from 'react';
 import {cancelReason} from '../../constants/booking';
 import {useCancelBookingMutation} from '../../services/api';
-import Toast from 'react-native-toast-message';
 import {load} from '../../utils/storage';
 import {KeyAsyncStorage} from '../../constants/asyncStorage';
 
@@ -23,7 +22,6 @@ export const FindDriverModal = ({open, setOpen, setShowBooking}: Props) => {
     useEffect(() => {
         open && load(KeyAsyncStorage.BOOKING).then(data => setId(data.id));
     }, [open]);
-    console.log({id});
 
     return (
         <>
@@ -108,15 +106,11 @@ export const FindDriverModal = ({open, setOpen, setShowBooking}: Props) => {
                                     if (!reason && !textReason)
                                         setErrorMes('Vui Lòng Chọn Lý Do Hủy');
                                     else {
-                                        console.log('abcasdf');
-                                        console.log({cancelReason});
-
                                         cancelBooking({
                                             id,
                                             cancelReason: reason || textReason,
                                         }).then(() => {
                                             setOpen(false);
-                                            setShowBooking(true);
                                             setTextReason('');
                                             setReason(undefined);
                                             setCancel(false);

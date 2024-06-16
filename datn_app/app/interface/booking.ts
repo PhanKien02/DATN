@@ -1,13 +1,12 @@
-import {BookingStatus} from '../constants/booking';
 import {Image} from './image';
 import {IUser} from './user';
 
 export interface IBooking {
-    id?: number;
+    id: number;
 
-    date: Date;
+    date: Date | '';
 
-    statused: BookingStatus.FIND_DRIVER;
+    statused: string;
 
     cancelReason: string;
 
@@ -19,28 +18,51 @@ export interface IBooking {
 
     paymentStatus: boolean;
 
-    pick_up_point: string;
+    originLocaition: number;
 
-    dropOffPoint: string;
+    originAddress: string;
+
+    originlongitude: number;
+
+    originLatitude: number;
+
+    destinationAddress: string;
 
     vehicleReceiptImage?: Image[];
 
-    customer: IUser;
-
-    driver: IUser;
-
-    driverId: number;
+    customer?: IUser;
 
     customerId: number;
+
+    promotionId: number;
+    destinationLatitude: number;
+
+    destinationLongitude: number;
 }
 export interface BookingPayLoad {
     customerId: number;
-    pick_up_point: string;
-    dropOffPoint: string;
+
+    originAddress: string;
+
+    originlongitude: number;
+
+    originLatitude: number;
+
+    destinationAddress: string;
+
     paymentStatus: boolean;
+
     totalPayment: number;
+
     longDistance: number;
+
+    promotionId: number;
+
     paymentMethod: string;
-    promotionId?: number;
+
     unitPriceId: number;
+
+    destinationLatitude: number;
+
+    destinationLongitude: number;
 }

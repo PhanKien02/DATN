@@ -17,13 +17,13 @@ import { toast } from "react-toastify";
 import { UserRoles } from "../utils/userRole";
 const UserManagerPage = () => {
      const { Search } = Input;
-     const [page, setPage] = useState(1);
-     const [limit, setLimit] = useState(10);
+     // const [page, setPage] = useState(1);
+     // const [limit, setLimit] = useState(10);
      const [search, setSearch] = useState("");
-     const { users, isLoading, refetch } = useGetAllUsers(page, limit, search);
+     const { users, isLoading, refetch } = useGetAllUsers(search);
      useEffect(() => {
           refetch();
-     }, [users, refetch, page, limit, search]);
+     }, [users, refetch, search]);
      const onSearch = (value: string) => {
           setSearch(value);
      };
@@ -230,25 +230,11 @@ const UserManagerPage = () => {
                                         <>
                                              <Table
                                                   columns={columns}
-                                                  dataSource={users.users.filter(
+                                                  dataSource={users.filter(
                                                        (us) => us.role === role
                                                   )}
                                                   pagination={false}
                                              />
-                                             {/* <Pagination
-                                                       className="!mr-5 !mt-10"
-                                                       showSizeChanger
-                                                       defaultCurrent={page}
-                                                       pageSize={limit}
-                                                       total={users.totalPage}
-                                                       onChange={(
-                                                            current,
-                                                            pageSize
-                                                       ) => {
-                                                            setPage(current);
-                                                            setLimit(pageSize);
-                                                       }}
-                                                  /> */}
                                         </>
                                    ),
                               };

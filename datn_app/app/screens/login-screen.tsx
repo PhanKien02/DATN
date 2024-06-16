@@ -17,9 +17,10 @@ import {Loading} from '../components/Loading';
 import {useAppDispatch} from '../models/root-store/root-store';
 import Toast from 'react-native-toast-message';
 import {LOGIN} from '../models/auth-slice';
-import {save, saveString} from '../utils/storage';
+import {save} from '../utils/storage';
 import {KeyAsyncStorage} from '../constants/asyncStorage';
 import Firebase from '../utils/firebase';
+import {UserRoles} from '../models/enums/userRoles';
 function LoginScreen({navigation}) {
     const [login, {isLoading, error}] = useLoginMutation();
     const [fcmId, setFcmId] = useState();
@@ -48,18 +49,25 @@ function LoginScreen({navigation}) {
                     token: payload.token.token,
                 };
                 dispath(LOGIN(auth));
-                saveString(KeyAsyncStorage.TOKEN, payload.token.token);
+                save(KeyAsyncStorage.TOKEN, payload.token.token);
                 save(KeyAsyncStorage.USER, payload.user);
                 Toast.show({
                     type: 'success',
                     text1: `Chúc Mừng ${payload.user.fullName} Đã Đăng Nhập Tài Khoản Thành Công`,
                 });
-                if (payload.user.activated)
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: screens.home}],
-                    });
-                else
+                if (payload.user.activated) {
+                    if (payload.user.roleName === UserRoles.USER)
+                        navigation.reset({
+                            index: 0,
+                            routes: [{name: screens.home}],
+                        });
+                    else {
+                        navigation.reset({
+                            index: 0,
+                            routes: [{name: screens.driver}],
+                        });
+                    }
+                } else
                     navigation.navigate(screens.verifyOTP, {
                         email: payload.user.email,
                         fullName: payload.user.fullName,

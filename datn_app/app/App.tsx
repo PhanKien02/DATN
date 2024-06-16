@@ -69,47 +69,6 @@ function App() {
         notifee.requestPermission({
             criticalAlert: true,
         });
-
-        const unsubscribe = Firebase.onMessage(async dataCallBack => {
-            await notifee.deleteChannel('important');
-            // Create a channel
-            const channelId = await notifee.createChannel({
-                id: 'important',
-                name: 'Important Notifications',
-                importance: AndroidImportance.HIGH,
-                sound: 'default',
-            });
-
-            try {
-                // Display a notification
-                notifee.displayNotification({
-                    title: `${dataCallBack.notification.title}`,
-                    subtitle: '',
-                    body: dataCallBack.notification.body,
-                    data: dataCallBack.data,
-                    android: {
-                        channelId,
-                        color: '#FF8A00',
-                        importance: AndroidImportance.HIGH,
-                        actions: [
-                            {
-                                title: '<b>Có Chuyến Đi Mới</b>',
-                                pressAction: {
-                                    id: 'dance',
-                                },
-                            },
-                        ],
-                        sound: 'default',
-                    },
-                    ios: {
-                        sound: 'local.wav',
-                    },
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        });
-        return unsubscribe;
     }, []);
 
     return (
@@ -167,6 +126,7 @@ function App() {
                                     {...props}
                                     style={{
                                         backgroundColor: '#13e5ed',
+                                        height: 40,
                                         borderLeftColor: '#13e5ed',
                                     }}
                                     text1Style={{
