@@ -45,8 +45,6 @@ class PromotionService {
             );
     }
     async getPromotionByCondition(km: number) {
-        console.log({ km });
-
         let promotions = await promotionRepository.findAll({
             where: {
                 conditionPrice: {

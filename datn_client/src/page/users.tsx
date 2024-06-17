@@ -3,7 +3,6 @@ import useGetAllUsers from "../hook/useGetUser";
 import { Button, Spin, Tabs } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { IUser } from "../models/user.model";
-import { Pagination } from "antd";
 import { formatDate } from "../utils/formatDate";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
@@ -17,8 +16,6 @@ import { toast } from "react-toastify";
 import { UserRoles } from "../utils/userRole";
 const UserManagerPage = () => {
      const { Search } = Input;
-     // const [page, setPage] = useState(1);
-     // const [limit, setLimit] = useState(10);
      const [search, setSearch] = useState("");
      const { users, isLoading, refetch } = useGetAllUsers(search);
      useEffect(() => {
@@ -27,6 +24,7 @@ const UserManagerPage = () => {
      const onSearch = (value: string) => {
           setSearch(value);
      };
+
      const handleBlockOrActiveUser = (idUser: number, active: boolean) => {
           userService
                .blockOrActiveUser(idUser, active)

@@ -177,8 +177,6 @@ class BookingService {
     }
 
     async rejectBooking(idBooking: number, driverId: number) {
-        console.log({ idBooking, driverId });
-
         const booking = await bookingRepository.findByPk(idBooking);
         if (!booking)
             throw new BadRequestError("Có Lỗi Hệ Thống Vui Lòng Thử Lại Sau");
@@ -325,8 +323,6 @@ class BookingService {
     }
 
     async completeBookinng(idBoking: number, idDriver: string) {
-        console.log({ idBoking, idDriver });
-
         const booking = await bookingRepository.findOne({
             where: {
                 id: idBoking,

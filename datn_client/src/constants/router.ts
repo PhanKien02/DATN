@@ -1,6 +1,7 @@
 import MainLayout from "../layouts/mainLayout";
 import BookingManagerPage from "../page/booking";
 import DashboadPage from "../page/dashboad";
+import InvoiceManagerPage from "../page/invoice";
 import { LoginPage } from "../page/login";
 import PromotionManagerPage from "../page/promotion";
 import UnitPriceManagerPage from "../page/unitPrice";
@@ -38,6 +39,11 @@ const routers: RouteObject[] = [
                     path: "/don-hang",
                     id: "booking",
                     Component: BookingManagerPage,
+               },
+               {
+                    path: "/hoa-don",
+                    id: "invoice",
+                    Component: InvoiceManagerPage,
                },
           ],
      },
