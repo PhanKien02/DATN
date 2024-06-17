@@ -1,6 +1,7 @@
 import { BookingStatus } from "../constants/booking";
 import { Image } from "./image";
 import { IPromotion } from "./promotion";
+import { IUnitPrice } from "./unitPrice";
 import { IUser } from "./user.model";
 
 export interface IBooking {
@@ -39,6 +40,7 @@ export interface IBooking {
      customerId: number;
 
      promotion: IPromotion;
+     unitPrice: IUnitPrice;
 }
 export interface BookingPayLoad {
      customerId: number;

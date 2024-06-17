@@ -47,7 +47,7 @@ export const MenuItems: MenuItems[] = [
 
      {
           title: "Hóa Đơn",
-          link: "###",
+          link: "/hoa-don",
           id: "invoice",
           icon: FaFileInvoiceDollar,
      },

@@ -11,6 +11,7 @@ import unitPriceRouter from "./unitPriceRouter";
 import bookingRouter from "./bookingRouter";
 import routeDriver from "./routerDriverRouter";
 import { getMessaging } from "firebase-admin/messaging";
+import invoiceRouter from "./invoiceRouter";
 
 class MasterRouter extends BaseRouter {
     constructor() {
@@ -42,6 +43,7 @@ class MasterRouter extends BaseRouter {
         this.router.use("/promotion", promotionRouter);
         this.router.use("/price", unitPriceRouter);
         this.router.use("/booking", bookingRouter);
+        this.router.use("/invoice", invoiceRouter);
         this.router.use("/route", routeDriver);
         this.router.use(errorHandler);
     }

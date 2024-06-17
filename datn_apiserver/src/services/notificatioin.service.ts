@@ -18,7 +18,6 @@ class NotificationService {
 
         if (!receiver) throw new BadRequestError("Người Dùng Không Tồn Tại");
         const registrationTokens = receiver.map((rec) => rec.dataValues.fcmId);
-        console.log({ registrationTokens });
 
         getMessaging()
             .sendEachForMulticast({

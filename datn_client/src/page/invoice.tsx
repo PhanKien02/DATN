@@ -1,27 +1,25 @@
-import { Button, Pagination, PaginationProps, Spin } from "antd";
+import { Button, Pagination, Spin } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { useState } from "react";
-import useGetAllBooking from "../hook/useGetAllBooking";
-import { IBooking } from "../models/booking";
 import { formatDateTime } from "../utils/formatDate";
-import { BookingStatus } from "../constants/booking";
-import { MdAssignmentInd } from "react-icons/md";
-import AssignDriverModal from "../modals/assignDriverModal";
+import useGetAllInvoice from "../hook/useGetAllInvoice";
+import { IInvoice } from "../models/invoice";
+import Search from "antd/es/input/Search";
+import { SearchOutlined } from "@ant-design/icons";
+import ExportInvoice from "../components/invoicePdf";
+import { BsFileEarmarkPdfFill } from "react-icons/bs";
 
-const BookingManagerPage = () => {
+const InvoiceManagerPage = () => {
      const [limit, setLimit] = useState(10);
-     const [openAssignDriverModal, setOpenAssignDriverModal] = useState(false);
-     const [data, setData] = useState<IBooking>();
+     const [searchText, setSearchText] = useState("");
+     const [invoice, setInvoice] = useState<IInvoice>();
+     const [isOpenPDFPreview, setIsOpenPDFPreview] = useState(false);
      const [page, setPage] = useState(1);
-     const { bookings, isLoading, refetch } = useGetAllBooking(page, limit);
-     const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
-          current,
-          pageSize
-     ) => {
-          console.log(current, pageSize);
-     };
-     if (!bookings || isLoading) return <Spin />;
-     const columns: ColumnsType<IBooking> = [
+     const { invoices, isLoading } = useGetAllInvoice(page, limit, searchText);
+
+     const searchbutton = <SearchOutlined type="default" />;
+     if (!invoices || isLoading) return <Spin />;
+     const columns: ColumnsType<IInvoice> = [
           {
                title: "Khách Hàng",
                width: 150,
@@ -29,7 +27,7 @@ const BookingManagerPage = () => {
                key: "customer",
                fixed: "left",
                render: (_, record) => {
-                    return record.customer.fullName;
+                    return record.booking.customer.fullName;
                },
           },
           {
@@ -38,25 +36,16 @@ const BookingManagerPage = () => {
                dataIndex: "driver",
                key: "driver",
                render: (_, record) => {
-                    return record.driver
-                         ? record.driver.fullName
-                         : "Chưa Có Tài Xế";
+                    return record.booking.driver.fullName;
                },
-          },
-          {
-               title: "Điểm Đón",
-               dataIndex: "originAddress",
-               key: "originAddress",
-          },
-          {
-               title: "Điểm Đến",
-               dataIndex: "destinationAddress",
-               key: "destinationAddress",
           },
           {
                title: "Quãng Đường (Km)",
                dataIndex: "longDistance",
                key: "longDistance",
+               render: (_, record) => {
+                    return record.booking.longDistance;
+               },
           },
           {
                title: "Ngày Giờ",
@@ -73,7 +62,7 @@ const BookingManagerPage = () => {
                render: (_, record) => {
                     return (
                          <p>
-                              {record.totalPayment.toLocaleString("vi-VN", {
+                              {record.totalCost.toLocaleString("vi-VN", {
                                    style: "currency",
                                    currency: "VND",
                               })}
@@ -87,9 +76,16 @@ const BookingManagerPage = () => {
                key: "promotion",
                render: (_, record) => {
                     return `${
-                         record.promotion ? record.promotion.percent : 0
+                         record.booking.promotion
+                              ? record.booking.promotion.percent
+                              : 0
                     } %`;
                },
+          },
+          {
+               title: "Người Thanh Toán",
+               dataIndex: "cashier",
+               key: "cashier",
           },
           {
                title: "Thanh Toán",
@@ -99,12 +95,12 @@ const BookingManagerPage = () => {
                     return (
                          <p
                               className={`${
-                                   record.paymentStatus
+                                   record.paymentMethod
                                         ? "text-green-500"
                                         : "text-red-500"
                               }`}
                          >
-                              {record.paymentStatus
+                              {record.paymentMethod
                                    ? "Đã Thanh Toán"
                                    : "Chưa Thanh Toán"}
                          </p>
@@ -121,25 +117,7 @@ const BookingManagerPage = () => {
                     },
                ],
                onFilter(value, record) {
-                    return record.paymentStatus === value;
-               },
-          },
-          {
-               title: "Trạng Thái",
-               dataIndex: "statused",
-               key: "statused",
-               fixed: "right",
-               filters: Object.values(BookingStatus).map((status) => {
-                    return {
-                         text: status,
-                         value: status,
-                    };
-               }),
-               onFilter(value, record) {
-                    return record.statused === value;
-               },
-               render: (_, record) => {
-                    return record.statused ? <p>{record.statused}</p> : "N/A";
+                    return record.booking.paymentStatus === value;
                },
           },
           {
@@ -151,42 +129,41 @@ const BookingManagerPage = () => {
                     return (
                          <>
                               <Button
-                                   type="primary"
+                                   className="!bg-red-500 "
                                    onClick={() => {
-                                        setOpenAssignDriverModal(true);
-                                        setData(record);
+                                        setInvoice(record),
+                                             setIsOpenPDFPreview(true);
                                    }}
-                                   disabled={
-                                        record.statused ===
-                                             BookingStatus.FIND_DRIVER ||
-                                        record.statused ===
-                                             BookingStatus.DRIVER_REJECT
-                                             ? false
-                                             : true
-                                   }
-                                   className="!flex items-center justify-center gap-4!mr-5 !bg-green-500"
                               >
-                                   <span className="mr-1 text-md">
-                                        <MdAssignmentInd />
-                                   </span>
-                                   <span>Tài Xế</span>
+                                   <BsFileEarmarkPdfFill color="#fff" />
                               </Button>
                          </>
                     );
                },
           },
      ];
+
      return (
           <>
                <div className="flex flex-col h-full mt-4 ml-1">
                     <div className="flex items-end justify-between">
-                         <h1 className="text-5xl ml-4">Danh Sách Đơn Hàng</h1>
+                         <h1 className="text-5xl ml-4">Quản Lý Hóa Đơn</h1>
+                    </div>
+                    <div className="flex flex-col items-end w-full">
+                         <Search
+                              className="w-6/12 mr-5 mt-2"
+                              placeholder="Search"
+                              onSearch={setSearchText}
+                              enterButton={searchbutton}
+                              style={{ width: 400 }}
+                              size="large"
+                         />
                     </div>
                     <div className="flex flex-col items-end w-full h-full">
                          <Table
                               className="h-full w-full mt-6 "
                               columns={columns}
-                              dataSource={bookings.bookings}
+                              dataSource={invoices.invoices}
                               pagination={false}
                               scroll={{ x: 1500, y: 400 }}
                          />
@@ -195,9 +172,8 @@ const BookingManagerPage = () => {
                               showSizeChanger
                               showQuickJumper
                               defaultCurrent={1}
-                              onShowSizeChange={onShowSizeChange}
                               pageSize={limit}
-                              total={bookings.total}
+                              total={invoices.total}
                               onChange={(current, pageSize) => {
                                    setPage(current);
                                    setLimit(pageSize);
@@ -205,15 +181,20 @@ const BookingManagerPage = () => {
                          />
                     </div>
                </div>
-               {data && (
-                    <AssignDriverModal
-                         refetch={refetch}
-                         data={data}
-                         open={openAssignDriverModal}
-                         setOpen={setOpenAssignDriverModal}
-                    />
+               {isOpenPDFPreview && invoice && (
+                    <>
+                         <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+                         <div className="fixed inset-0 flex items-center justify-center z-50">
+                              <div className="bg-white p-6 rounded-lg shadow-lg min-h-[600px]">
+                                   <button className="absolute top-4 right-4">
+                                        Close
+                                   </button>
+                                   <ExportInvoice data={invoice} />
+                              </div>
+                         </div>
+                    </>
                )}
           </>
      );
 };
-export default BookingManagerPage;
+export default InvoiceManagerPage;
