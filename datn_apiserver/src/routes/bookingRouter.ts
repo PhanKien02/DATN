@@ -6,9 +6,11 @@ import {
     assignDriver,
     booking,
     cancelBooking,
+    completeBooking,
     getAllbooking,
     getBookingById,
     rejectBooking,
+    startMoving,
 } from "../controllers/booking.controller";
 
 /**
@@ -31,6 +33,8 @@ class BookingRouter extends BaseRouter {
         this.router.put("/assign", catchAsync(assignDriver));
         this.router.put("/reject", catchAsync(rejectBooking));
         this.router.put("/accept", catchAsync(acceptBooking));
+        this.router.put("/moving", catchAsync(startMoving));
+        this.router.put("/complete", catchAsync(completeBooking));
     }
 }
 

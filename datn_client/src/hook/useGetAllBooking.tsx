@@ -6,7 +6,7 @@ export interface Bookings {
      bookings: IBooking[];
      limit: number;
      page: number;
-     totalPage: number;
+     total: number;
 }
 
 export const useGetAllBooking = (

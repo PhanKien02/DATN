@@ -1,29 +1,34 @@
 import {Button, Modal, Text, View} from 'native-base';
 
 import {Loading} from '../Loading';
-import {useGetBookingByIdQuery} from '../../services/api';
+import {
+    useCompleteMovingMutation,
+    useGetBookingByIdQuery,
+    useStartMoingMutation,
+} from '../../services/api';
 import Toast from 'react-native-toast-message';
 import {useEffect, useState} from 'react';
 import {IBooking} from '../../interface/booking';
 import {CameraComponent} from '../cameraComponent';
 import Firebase from '../../utils/firebase';
+import {BookingStatus} from '../../constants/booking';
 
 interface Props {
-    bookingId?: number;
-    driverId?: number;
+    bookingId: number;
+    idDriver: number;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const InforBookingModal = ({
     bookingId,
-    driverId,
     open,
     setOpen,
+    idDriver,
 }: Props) => {
-    //camera
-
     const [booking, setBooking] = useState<IBooking | null>(null);
+    const [startMoving] = useStartMoingMutation();
+    const [completeBooking] = useCompleteMovingMutation();
     const {data, refetch, isLoading} = useGetBookingByIdQuery({bookingId});
     const [photoPath, setPhotoPath] = useState<{uri: string}[]>([]);
     useEffect(() => {
@@ -40,12 +45,22 @@ export const InforBookingModal = ({
                 text1: 'Vui Lòng Chụp Lại Xe Ít Nhất 5 Tấm Hình Trước Khi Di Chuyển',
             });
         else {
-            console.log('start');
-            const imagePath = photoPath.map(path => path.uri);
-            const url = await Firebase.uploadFiles(imagePath);
-            console.log({url});
+            if (booking.statused == BookingStatus.DRIVER_ACCEPTED) {
+                const imagePath = photoPath.map(path => path.uri);
+                const urls = (await Firebase.uploadFiles(imagePath))
+                    .map(url => url._j)
+                    .filter(url => url != null);
+                startMoving({bookingId, images: urls}).then(() => {
+                    setOpen(false);
+                    refetch();
+                });
+            }
+            if (booking.statused === BookingStatus.MOVING) {
+                completeBooking({bookingId, idDriver});
+            }
         }
     };
+    console.log({idDriver});
 
     return (
         <>
@@ -154,7 +169,10 @@ export const InforBookingModal = ({
                                 colorScheme="green"
                                 onPress={hanleStartMoving}>
                                 <Text fontWeight="bold" color={'#fff'}>
-                                    Bắt Đầu Di Chuyển
+                                    {booking &&
+                                    booking.statused != BookingStatus.MOVING
+                                        ? 'Bắt Đầu Di Chuyển'
+                                        : 'Thanh Toán Và Hoàn Thành Chuyến Đi'}
                                 </Text>
                             </Button>
                         </Modal.Footer>

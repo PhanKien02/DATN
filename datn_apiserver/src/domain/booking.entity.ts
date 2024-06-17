@@ -70,14 +70,14 @@ export default class Booking extends Model {
     @HasMany(() => Image)
     vehicleReceiptImage?: Image[];
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, "customerId")
     customer: User;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.BIGINT })
     customerId: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, "driverId")
     driver: User;
 
     @ForeignKey(() => User)

@@ -33,7 +33,7 @@ const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export const DriverHomeScreen = () => {
     const [openInfo, setOpenInfo] = useState(false);
-    const user = useAppSelector(state => state.auth);
+    const user = useAppSelector(state => state.auth.user);
     const booking = useAppSelector(state => state.boooking.booking);
     const [tracking] = useTrackingLocationDriverMutation();
     const mapRef = useRef(null);
@@ -52,7 +52,7 @@ export const DriverHomeScreen = () => {
                 longitude: longitude,
             });
             tracking({
-                id: user.user.id,
+                id: user.id,
                 lat: latitude,
                 long: longitude,
             })
@@ -115,7 +115,7 @@ export const DriverHomeScreen = () => {
                         Xin Chào
                     </Text>
                     <Text ml={10} mt={1} fontWeight="bold" color="white">
-                        {user?.user ? user.user.fullName : ''}
+                        {user ? user.fullName : ''}
                     </Text>
                 </View>
                 <Center w="100%" h="full" style={{position: 'relative'}}>
@@ -218,6 +218,7 @@ export const DriverHomeScreen = () => {
                     open={openInfo}
                     setOpen={setOpenInfo}
                     bookingId={booking.id}
+                    idDriver={user.id}
                 />
             )}
         </>

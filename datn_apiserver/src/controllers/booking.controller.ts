@@ -59,8 +59,6 @@ export const getBookingById = async (
     res: Response
 ) => {
     const { bookingId } = req.query;
-    console.log("query", req.query);
-
     const response = await bookingService.getBookingById(+bookingId);
     return res.status(httpStatus.OK).send(response);
 };
@@ -69,8 +67,26 @@ export const acceptBooking = async (
     res: Response
 ) => {
     const { bookingId, driverId } = req.body;
-    console.log({ bookingId, driverId });
-
     await bookingService.acceptBooking(+bookingId, driverId);
     return res.status(httpStatus.OK).send();
+};
+
+export const startMoving = async (req: AuthenticatedRequest, res: Response) => {
+    const { bookingId, images } = req.body;
+
+    const response = await bookingService.startMoving(+bookingId, images);
+    return res.status(httpStatus.OK).send(response);
+};
+
+export const completeBooking = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const { bookingId, idDriver } = req.body;
+
+    const response = await bookingService.completeBookinng(
+        +bookingId,
+        idDriver
+    );
+    return res.status(httpStatus.OK).send(response);
 };

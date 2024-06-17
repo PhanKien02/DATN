@@ -9,7 +9,7 @@ import { MdAssignmentInd } from "react-icons/md";
 import AssignDriverModal from "../modals/assignDriverModal";
 
 const BookingManagerPage = () => {
-     const [limit, setLimit] = useState(10);
+     const [limit, setLimit] = useState(5);
      const [openAssignDriverModal, setOpenAssignDriverModal] = useState(false);
      const [data, setData] = useState<IBooking>();
      const [page, setPage] = useState(1);
@@ -67,14 +67,18 @@ const BookingManagerPage = () => {
                },
           },
           {
-               title: "Thanh Toán",
+               title: "Tổng Tiền",
                dataIndex: "totalPayment",
                key: "totalPayment",
                render: (_, record) => {
-                    return record.totalPayment.toLocaleString("vi-VN", {
-                         style: "currency",
-                         currency: "VND",
-                    });
+                    return (
+                         <p>
+                              {record.totalPayment.toLocaleString("vi-VN", {
+                                   style: "currency",
+                                   currency: "VND",
+                              })}
+                         </p>
+                    );
                },
           },
           {
@@ -92,9 +96,32 @@ const BookingManagerPage = () => {
                dataIndex: "paymentStatus",
                key: "paymentStatus",
                render: (_, record) => {
-                    return record.paymentStatus
-                         ? "Đã Thanh Toán"
-                         : "Chưa Thanh Toán";
+                    return (
+                         <p
+                              className={`${
+                                   record.paymentStatus
+                                        ? "text-green-500"
+                                        : "text-red-500"
+                              }`}
+                         >
+                              {record.paymentStatus
+                                   ? "Đã Thanh Toán"
+                                   : "Chưa Thanh Toán"}
+                         </p>
+                    );
+               },
+               filters: [
+                    {
+                         text: "Chưa Thanh Toán",
+                         value: false,
+                    },
+                    {
+                         text: "Đã Thanh Toán",
+                         value: true,
+                    },
+               ],
+               onFilter(value, record) {
+                    return record.paymentStatus === value;
                },
           },
           {
@@ -155,7 +182,7 @@ const BookingManagerPage = () => {
                     <div className="flex items-end justify-between">
                          <h1 className="text-5xl ml-4">Danh Sách Đơn Hàng</h1>
                     </div>
-                    <div className="flex flex-col items-end w-full">
+                    <div className="flex flex-col items-end w-full h-full">
                          <Table
                               className="h-full w-full mt-6 "
                               columns={columns}
@@ -166,10 +193,11 @@ const BookingManagerPage = () => {
                          <Pagination
                               className="!mr-5 !mb-5 !mt-5"
                               showSizeChanger
-                              defaultCurrent={page}
+                              showQuickJumper
+                              defaultCurrent={1}
                               onShowSizeChange={onShowSizeChange}
                               pageSize={limit}
-                              total={bookings.totalPage}
+                              total={bookings.total}
                               onChange={(current, pageSize) => {
                                    setPage(current);
                                    setLimit(pageSize);

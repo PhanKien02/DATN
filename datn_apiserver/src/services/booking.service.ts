@@ -1,6 +1,6 @@
 import { Op, where } from "sequelize";
 import { database } from "../configs/database";
-import { BookingStatus } from "../domain/Enums/booking";
+import { BookingStatus, PaymentMethod } from "../domain/Enums/booking";
 import bookingRepository from "../repositories/bookingRepository";
 import invoiceRepository from "../repositories/invoiceRepository";
 import { BookingPayLoad } from "../types/booking";
@@ -13,28 +13,16 @@ import { User } from "../utils/user";
 import { UserRoles } from "../domain/Enums/userRoles";
 import authorityRepository from "../repositories/authorityRepository";
 import { StatusDriver } from "../constants/statusDriver";
+import imageRepository from "../repositories/imageRepository";
 
 class BookingService {
     async booking(user: User, booking: BookingPayLoad) {
         const t = await database.transaction();
-        console.log({ booking });
-
         const newBooking = await bookingRepository.create({
             ...booking,
             statused: BookingStatus.FIND_DRIVER,
             date: new Date(),
         });
-        if (booking.paymentStatus === true) {
-            await invoiceRepository
-                .create({
-                    bookingId: newBooking.toJSON().id,
-                    totalCost: booking.totalPayment,
-                    paymentMethod: booking.paymentMethod,
-                    date: new Date(),
-                    cashier: "Chuyển Khoản",
-                })
-                .catch(() => t.rollback());
-        }
         const admins = await userRepository.findAll({
             include: [
                 {
@@ -126,25 +114,34 @@ class BookingService {
             };
         query["limit"] = limit;
         query["offset"] = (page - 1) * limit;
-        const { rows, count } = await bookingRepository.findAndCountAll({
-            ...query,
-            include: [
-                {
-                    model: userRepository,
-                    association: "customer",
-                    as: "customer",
-                },
-                unitPriceRepository,
-                promotionRepository,
-            ],
-            order: [["createdDate", "DESC"]],
-        });
+        const [listBooking, bookings] = await Promise.all([
+            bookingRepository.findAll(),
+            bookingRepository.findAll({
+                ...query,
+                include: [
+                    {
+                        model: userRepository,
+                        association: "customer",
+                        as: "customer",
+                    },
+                    {
+                        model: userRepository,
+                        association: "driver",
+                        as: "driver",
+                    },
+                    unitPriceRepository,
+                    promotionRepository,
+                    imageRepository,
+                ],
+                order: [["createdDate", "DESC"]],
+            }),
+        ]);
 
         return {
-            bookings: rows,
+            bookings: bookings,
             limit: limit,
             page: page,
-            totalPage: Math.ceil(count / limit),
+            total: listBooking.length,
         };
     }
 
@@ -245,7 +242,8 @@ class BookingService {
                 },
             ],
         });
-        if (!booking) throw new BadRequestError("Cuốc Xe Không Tồn Tại");
+        if (!booking)
+            throw new BadRequestError("Có Lỗi Hệ Thống Vui Lòng Thử Lại");
         Promise.all([
             bookingRepository.update(
                 {
@@ -278,11 +276,10 @@ class BookingService {
                 },
             ],
         });
-        console.log("cus", booking.dataValues.customer);
-
         const fcmIds = admins
             .map((admin) => admin.toJSON().id)
             .concat([booking.dataValues.customer.id]);
+
         await notificatioinService.pushNotification(
             fcmIds,
             "Thông Báo Đơn Hàng",
@@ -291,6 +288,87 @@ class BookingService {
                 bookingId: bookingId.toString(),
             }
         );
+    }
+    async startMoving(idBooking: number, images: string[]) {
+        const booking = await bookingRepository.findOne({
+            where: {
+                id: idBooking,
+                statused: BookingStatus.DRIVER_ACCEPTED,
+            },
+        });
+        if (!booking)
+            throw new BadRequestError("Có Lỗi Hệ Thống Vui Lòng Thử Lại");
+        const admins = await userRepository.findAll({
+            include: [
+                {
+                    model: authorityRepository,
+                    where: {
+                        name: UserRoles.ADMIN,
+                    },
+                },
+            ],
+        });
+        return Promise.all([
+            bookingRepository.update(
+                { statused: BookingStatus.MOVING },
+                { where: { id: idBooking } }
+            ),
+            imageRepository.bulkCreate(
+                images.map((image) => {
+                    return {
+                        link: image,
+                        bookingid: idBooking,
+                    };
+                })
+            ),
+        ]);
+    }
+
+    async completeBookinng(idBoking: number, idDriver: string) {
+        console.log({ idBoking, idDriver });
+
+        const booking = await bookingRepository.findOne({
+            where: {
+                id: idBoking,
+                statused: BookingStatus.MOVING,
+                driverId: idDriver,
+            },
+            include: [{ model: userRepository, as: "driver" }],
+        });
+        if (!booking)
+            throw new BadRequestError("Có Lỗi Hệ Thống Vui Lòng Thử Lại");
+        const bookingData = booking.dataValues;
+        if (!bookingData.paymentStatus) {
+            await invoiceRepository.create({
+                bookingId: bookingData.id,
+                totalCost: bookingData.totalPayment,
+                cashier: bookingData.driver.fullName,
+                paymentMethod: PaymentMethod.CASH,
+                date: new Date(),
+            });
+        }
+        return await Promise.all([
+            bookingRepository.update(
+                {
+                    statused: BookingStatus.COMPLETE,
+                    paymentStatus: true,
+                },
+                {
+                    where: {
+                        id: idBoking,
+                        statused: BookingStatus.MOVING,
+                    },
+                }
+            ),
+            userRepository.update(
+                {
+                    statusDriver: StatusDriver.FREE,
+                },
+                {
+                    where: { id: idDriver },
+                }
+            ),
+        ]);
     }
 }
 export default new BookingService();

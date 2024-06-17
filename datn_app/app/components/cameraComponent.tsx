@@ -85,9 +85,6 @@ export const CameraComponent = ({photoPath, setPhotoPath}: Props) => {
                 qualityPrioritization: 'quality',
             });
             savePhoto(newPhoto.path);
-            // setPhotoPath(photo =>
-            //     photo.concat([{uri: 'file://' + newPhoto.path}]),
-            // );
         } catch (e) {
             console.log(e);
         }
@@ -97,7 +94,7 @@ export const CameraComponent = ({photoPath, setPhotoPath}: Props) => {
             <Center mt={3}>
                 <Button
                     onPress={() => {
-                        photoPath.length > 0
+                        photoPath.length > 5
                             ? setIsVisible(true)
                             : setShowCam(true);
                     }}

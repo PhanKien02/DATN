@@ -79,11 +79,8 @@ export default class Firebase {
         });
 
     static uploadFiles = async (imagePath: string[]) => {
-        console.log({upload: imagePath});
-
         const uploads = [];
         const promises = [];
-
         imagePath.forEach(file => {
             const reference = storage().ref(
                 'bookings/' + file.split('/').pop(),
@@ -91,18 +88,15 @@ export default class Firebase {
             const task = reference
                 .putFile(file)
                 .then(() => {
-                    // 4
                     const url = storage()
                         .ref('bookings/' + file.split('/').pop())
                         .getDownloadURL();
                     uploads.push(url);
                 })
-                .catch(e => console.log('uploading image error => ', e)); // 3
+                .catch(e => console.log('uploading image error => ', e));
             promises.push(task);
         });
-
-        const ul = await Promise.all(promises); // Wait for all promises to
-        console.log({uploads, ul});
+        await Promise.all(promises);
         return uploads;
     };
 }
