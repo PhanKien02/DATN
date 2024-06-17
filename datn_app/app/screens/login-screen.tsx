@@ -94,7 +94,6 @@ function LoginScreen({navigation}) {
                         color="black"
                         width="full"
                         textAlign="left"
-                        alignItems="start"
                         marginBottom="2">
                         Đăng Nhập
                     </Text>

@@ -16,7 +16,7 @@ import {
     getAddressFromLocation,
     getCurrentPosition,
     getDirections,
-    getDistance,
+    getLongDistance,
 } from '../utils/location';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 import MapViewDirections from 'react-native-maps-directions';
@@ -152,8 +152,9 @@ export const HomeScreen = () => {
             latitude: destinationRegion.latitude,
             longitude: destinationRegion.longitude,
         };
-        setDistance(getDistance(origin, des));
+        setDistance(getLongDistance(origin, des));
     }, [departureRegion, destinationRegion]);
+    console.log({distance});
 
     return (
         <>

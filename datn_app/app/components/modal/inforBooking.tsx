@@ -100,6 +100,19 @@ export const InforBookingModal = ({
                                             display: 'flex',
                                             flexDirection: 'row',
                                             justifyContent: 'space-between',
+                                        }}>
+                                        <Text fontWeight="bold">
+                                            Số Điện Thoại:
+                                        </Text>
+                                        <Text>{booking.customer.phone}</Text>
+                                    </View>
+                                    <View
+                                        w="full"
+                                        style={{
+                                            gap: 3,
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
                                             flexWrap: 'wrap',
                                         }}>
                                         <Text fontWeight="bold">Điểm Đón:</Text>

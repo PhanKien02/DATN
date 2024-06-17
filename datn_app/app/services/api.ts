@@ -1,7 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
-const url =
-    'https://b828-2402-800-6294-97b-45c-c5ac-79cc-ca2b.ngrok-free.app/api/';
+const url = 'https://0880-14-236-44-238.ngrok-free.app/api/';
 export const api = createApi({
     // Tương tự tên Slice khi tạo Slice thông thường
     reducerPath: 'api',
@@ -33,10 +32,10 @@ export const api = createApi({
         }),
 
         register: builder.mutation({
-            query: ({email, fullName, password, roleName}) => ({
+            query: ({email, fullName, password, roleName, phone}) => ({
                 url: `${url}authenticate/sign-up`,
                 method: 'POST',
-                body: {email, fullName, password, roleName},
+                body: {email, fullName, password, roleName, phone},
             }),
         }),
 

@@ -2,7 +2,7 @@ import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 import {useGetDirectionsQuery} from '../services/api';
-import {getPreciseDistance} from 'geolib';
+import {getDistance} from 'geolib';
 // const client = new Client();
 Geocoder.init(API_GG_MAP_KEY);
 export interface Location {
@@ -90,8 +90,8 @@ export const getDirections = async (origin: string, destination: string) => {
     return {poylines, distance, duration};
 };
 
-export const getDistance = (origin: Location, des: Location) => {
-    return getPreciseDistance(
+export const getLongDistance = (origin: Location, des: Location) => {
+    return getDistance(
         {
             latitude: `${origin.latitude}`,
             longitude: `${origin.longitude}`,
