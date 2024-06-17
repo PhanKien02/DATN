@@ -3,6 +3,7 @@ import {
     blockOrActiveUser,
     createStaff,
     getAllUser,
+    searchDrivingAround,
     updateStaff,
 } from "../controllers/user.controller";
 import catchAsync from "../utils/catchAsync";
@@ -21,6 +22,7 @@ class UserRouter extends BaseRouter {
      * Connect routes to their matching controller endpoints.
      */
     protected init() {
+        this.router.get("/driver", catchAsync(searchDrivingAround));
         this.router.use(veryfyToken);
         this.router.get("/", catchAsync(getAllUser));
         this.router.post("/", catchAsync(createStaff));

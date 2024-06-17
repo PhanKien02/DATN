@@ -50,22 +50,34 @@ export default class Booking extends Model {
     paymentStatus: boolean;
 
     @Column({ type: DataType.STRING })
-    pick_up_point: string;
+    originAddress: string;
+
+    @Column({ type: DataType.DOUBLE })
+    originlongitude: number;
+
+    @Column({ type: DataType.DOUBLE })
+    originLatitude: number;
+
+    @Column({ type: DataType.DOUBLE })
+    destinationLatitude: number;
+
+    @Column({ type: DataType.DOUBLE })
+    destinationLongitude: number;
 
     @Column({ type: DataType.STRING })
-    dropOffPoint: string;
+    destinationAddress: string;
 
     @HasMany(() => Image)
     vehicleReceiptImage?: Image[];
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, "customerId")
     customer: User;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.BIGINT })
     customerId: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, "driverId")
     driver: User;
 
     @ForeignKey(() => User)

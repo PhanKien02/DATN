@@ -1,4 +1,4 @@
-import {Center, Text, View} from 'native-base';
+import {Button, Center, Text, View} from 'native-base';
 import {useAppSelector} from '../models/root-store/root-store';
 import MapView, {
     PROVIDER_GOOGLE,
@@ -9,9 +9,13 @@ import {Alert, Dimensions, StyleSheet} from 'react-native';
 import {useEffect, useRef, useState} from 'react';
 import {openSettings} from 'react-native-permissions';
 import {requestLocationPermission} from '../utils/permissions';
-import {getAddressFromLocation, trackingLocation} from '../utils/location';
-import {useCaculateDistanceMutation} from '../services/api';
-// import SVGPowerOff from '../components/icons/powerOff';
+import {trackingLocation} from '../utils/location';
+
+import {useTrackingLocationDriverMutation} from '../services/api';
+import MapViewDirections from 'react-native-maps-directions';
+import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
+import {InforBookingModal} from '../components/modal/inforBooking';
+
 interface PositionProps {
     latitude?: number;
     longitude?: number;
@@ -28,32 +32,37 @@ const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export const DriverHomeScreen = () => {
-    const user = useAppSelector(state => state.auth);
-    const [caculateDistance] = useCaculateDistanceMutation();
+    const [openInfo, setOpenInfo] = useState(false);
+    const user = useAppSelector(state => state.auth.user);
+    const booking = useAppSelector(state => state.boooking.booking);
+    const [tracking] = useTrackingLocationDriverMutation();
     const mapRef = useRef(null);
-    const [departureAddress, setDepartureAddress] = useState('');
     const [departureRegion, setDepartureRegion] = useState<PositionProps>({});
-    // const [destinationRegion, setDestinationRegion] = useState<PositionProps>(
-    //     {},
-    // );
+    const [originRegion, setOriginRegion] = useState<PositionProps>({});
+    const [destinationRegion, setDestinationRegion] = useState<PositionProps>(
+        {},
+    );
     const getLiveLocation = async () => {
         const locPermissionDenied = await requestLocationPermission();
         if (locPermissionDenied.success) {
-            const {latitude, longitude, heading} = await trackingLocation();
-            console.log('get live location after 4 second', heading);
+            const {latitude, longitude} = await trackingLocation();
             new AnimatedRegion({latitude, longitude});
             setDepartureRegion({
                 latitude: latitude,
                 longitude: longitude,
             });
-            getAddressFromLocation(latitude, longitude).then(result => {
-                setDepartureAddress(result);
-            });
+            tracking({
+                id: user.id,
+                lat: latitude,
+                long: longitude,
+            })
+                .unwrap()
+                .then(() => console.log('tracking'));
         } else {
             Alert.alert(
                 '',
                 'Driver Service yêu cầu quyền truy cập vị trí của bạn',
-                [{text: 'Ok'}, {text: 'Cài đặt', onPress: openSettings}],
+                [{text: 'Cài đặt', onPress: openSettings}],
             );
         }
     };
@@ -62,6 +71,21 @@ export const DriverHomeScreen = () => {
             getLiveLocation();
     }, [departureRegion.latitude, departureRegion.longitude]);
 
+    useEffect(() => {
+        if (booking) {
+            setOriginRegion({
+                latitude: booking.originLatitude,
+                longitude: booking.originlongitude,
+                description: 'Điểm Đón ',
+            });
+
+            setDestinationRegion({
+                latitude: booking.destinationLatitude,
+                longitude: booking.destinationLongitude,
+                description: 'Điểm Đến ',
+            });
+        }
+    }, [booking]);
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.fitToCoordinates(
@@ -78,7 +102,6 @@ export const DriverHomeScreen = () => {
             );
         }
     }, [departureRegion]);
-
     return (
         <>
             <View w="100%">
@@ -92,7 +115,7 @@ export const DriverHomeScreen = () => {
                         Xin Chào
                     </Text>
                     <Text ml={10} mt={1} fontWeight="bold" color="white">
-                        {user?.user.fullName}
+                        {user ? user.fullName : ''}
                     </Text>
                 </View>
                 <Center w="100%" h="full" style={{position: 'relative'}}>
@@ -120,36 +143,84 @@ export const DriverHomeScreen = () => {
                                 latitudeDelta: LATITUDE_DELTA,
                                 longitudeDelta: LONGITUDE_DELTA,
                             }}>
-                            {departureRegion.latitude &&
-                                departureRegion.longitude && (
+                            {originRegion.latitude &&
+                                originRegion.longitude && (
                                     <MarkerAnimated
                                         coordinate={{
-                                            latitude: departureRegion.latitude,
-                                            longitude:
-                                                departureRegion.longitude,
+                                            latitude: originRegion.latitude,
+                                            longitude: originRegion.longitude,
                                         }}
-                                        title="Vị Trí Hiện Tại"
+                                        title="Vị Trí Đón"
                                         pinColor="#FBC632"
+                                        description={originRegion.description}
+                                    />
+                                )}
+                            {destinationRegion.latitude &&
+                                destinationRegion.longitude && (
+                                    <MarkerAnimated
+                                        coordinate={{
+                                            latitude:
+                                                destinationRegion.latitude,
+                                            longitude:
+                                                destinationRegion.longitude,
+                                        }}
+                                        title="Vị Trí Đến"
+                                        pinColor="#F43"
                                         description={
-                                            departureRegion.description
+                                            destinationRegion.description
                                         }
                                     />
                                 )}
+                            {departureRegion.latitude &&
+                                departureRegion.longitude &&
+                                destinationRegion.latitude &&
+                                destinationRegion.longitude && (
+                                    <MapViewDirections
+                                        origin={{
+                                            latitude: originRegion.latitude,
+                                            longitude: originRegion.longitude,
+                                        }}
+                                        destination={{
+                                            latitude:
+                                                destinationRegion.latitude,
+                                            longitude:
+                                                destinationRegion.longitude,
+                                        }}
+                                        apikey={API_GG_MAP_KEY}
+                                        strokeColor="red"
+                                        strokeWidth={2}
+                                        language="vn"
+                                        timePrecision="now"
+                                        optimizeWaypoints={true}
+                                    />
+                                )}
                         </MapView>
-                        {/* <Button
-                            borderRadius={20}
-                            style={{
-                                position: 'static',
-                                width: '14%',
-                                marginLeft: 10,
-                                marginTop: 5,
-                                backgroundColor: '#fff',
-                            }}>
-                            <SVGPowerOff />
-                        </Button> */}
                     </View>
+                    {booking && (
+                        <Center
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                bottom: 160,
+                            }}>
+                            <Button
+                                backgroundColor="#FBC632"
+                                w="full"
+                                onPress={() => setOpenInfo(true)}>
+                                Thông Tin Đơn Hàng
+                            </Button>
+                        </Center>
+                    )}
                 </Center>
             </View>
+            {booking && (
+                <InforBookingModal
+                    open={openInfo}
+                    setOpen={setOpenInfo}
+                    bookingId={booking.id}
+                    idDriver={user.id}
+                />
+            )}
         </>
     );
 };

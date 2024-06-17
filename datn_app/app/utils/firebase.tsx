@@ -1,5 +1,5 @@
 import messaging from '@react-native-firebase/messaging';
-
+import storage from '@react-native-firebase/storage';
 export default class Firebase {
     static getTokenFirebase = async () => {
         try {
@@ -77,4 +77,26 @@ export default class Firebase {
         messaging().onMessage(async remoteMessage => {
             callback(remoteMessage);
         });
+
+    static uploadFiles = async (imagePath: string[]) => {
+        const uploads = [];
+        const promises = [];
+        imagePath.forEach(file => {
+            const reference = storage().ref(
+                'bookings/' + file.split('/').pop(),
+            ); // 2
+            const task = reference
+                .putFile(file)
+                .then(() => {
+                    const url = storage()
+                        .ref('bookings/' + file.split('/').pop())
+                        .getDownloadURL();
+                    uploads.push(url);
+                })
+                .catch(e => console.log('uploading image error => ', e));
+            promises.push(task);
+        });
+        await Promise.all(promises);
+        return uploads;
+    };
 }

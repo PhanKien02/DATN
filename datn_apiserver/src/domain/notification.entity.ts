@@ -37,11 +37,11 @@ export default class Notification extends Model {
     receiver: User;
 
     @ForeignKey(() => User)
-    receiverId: User;
+    receiverId: number;
 
     @BelongsTo(() => User)
     sender: User;
 
     @ForeignKey(() => User)
-    senderId: User;
+    senderId: number;
 }

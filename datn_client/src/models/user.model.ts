@@ -25,6 +25,6 @@ export type LoginResponse = {
 
 export type LoginPayLoad = {
      password: string;
-     rememberMe: boolean;
+     fcmId: string;
      email: string;
 };

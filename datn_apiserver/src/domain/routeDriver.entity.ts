@@ -21,8 +21,9 @@ import User from "./user.entity";
 })
 export default class RouteDriver extends Model {
     @PrimaryKey
-    @Column({ type: DataType.CHAR })
-    id?: string;
+    @AutoIncrement
+    @Column({ type: DataType.BIGINT })
+    id?: number;
 
     @Column({ type: DataType.DOUBLE })
     lat: number;

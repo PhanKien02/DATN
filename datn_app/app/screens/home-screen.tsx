@@ -12,15 +12,20 @@ import {useEffect, useRef, useState} from 'react';
 import {openSettings} from 'react-native-permissions';
 import {requestLocationPermission} from '../utils/permissions';
 import {
+    Location,
     getAddressFromLocation,
     getCurrentPosition,
     getDirections,
+    getDistance,
 } from '../utils/location';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 import MapViewDirections from 'react-native-maps-directions';
 import {BookingModal} from '../components/modal/bookingModal';
 import {useDebouncedEffect} from '../utils/useDebouncedEffect';
-import {useGetLocationFromAddressMutation} from '../services/api';
+import {
+    useGetLocationFromAddressMutation,
+    useSearchAddressMutation,
+} from '../services/api';
 interface PositionProps {
     latitude?: number;
     longitude?: number;
@@ -39,25 +44,16 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export const HomeScreen = () => {
     const user = useAppSelector(state => state.auth);
     const mapRef = useRef(null);
+    const [distance, setDistance] = useState(0);
     const [departureAddress, setDepartureAddress] = useState('');
+    const [listOriginAddress, setListOriginAddress] = useState([]);
+    const [listDestinationAddress, setListDestinationAddress] = useState([]);
     const [destinationAddress, setDestinationAddress] = useState('');
     const [departureRegion, setDepartureRegion] = useState<PositionProps>({});
     const [destinationRegion, setDestinationRegion] = useState<PositionProps>(
         {},
     );
-    const [getLocation] = useGetLocationFromAddressMutation();
-    const [dataRoute, setDataRoute] = useState<{
-        poylines: {
-            latitude: number;
-            longitude: number;
-        }[];
-        distance: string;
-        duration: string;
-    }>({
-        poylines: [],
-        distance: '',
-        duration: '',
-    });
+    const [getLocation] = useSearchAddressMutation();
     const getLiveLocation = async () => {
         const locPermissionDenied = await requestLocationPermission();
         if (locPermissionDenied.success) {
@@ -67,16 +63,14 @@ export const HomeScreen = () => {
                 latitude: latitude,
                 longitude: longitude,
             });
-
-            // getAddressFromLocation(latitude, longitude).then(result => {
-            //     console.log({result});
-            //     setDepartureAddress(result);
-            // });
+            getAddressFromLocation(latitude, longitude).then(result => {
+                setDepartureAddress(result);
+            });
         } else {
             Alert.alert(
                 '',
                 'Driver Service yêu cầu quyền truy cập vị trí của bạn',
-                [{text: 'Ok'}, {text: 'Cài đặt', onPress: openSettings}],
+                [{text: 'Cài đặt', onPress: openSettings}],
             );
         }
     };
@@ -84,43 +78,45 @@ export const HomeScreen = () => {
         if (!departureRegion.latitude || !departureRegion.longitude)
             getLiveLocation();
     }, []);
-    useDebouncedEffect(
-        () =>
-            getDirections(departureAddress, destinationAddress).then(data => {
-                setDataRoute(data);
-            }),
-        [departureAddress, destinationAddress],
-        500,
-    );
+
     useDebouncedEffect(
         () =>
             departureAddress &&
-            destinationAddress &&
             getLocation({departureAddress})
                 .then(response => {
-                    console.log({departureLocation: response.data});
+                    response.data.predictions.length > 0
+                        ? setListOriginAddress(
+                              response.data.predictions[0].map(
+                                  add => add.response.data.predictions[0] || '',
+                              ),
+                          )
+                        : setListOriginAddress([]);
                 })
                 .catch(Err => {
                     console.log({Err});
                 }),
         [departureAddress],
-        300,
+        500,
     );
     useDebouncedEffect(
         () =>
-            departureAddress &&
             destinationAddress &&
-            getLocation({destinationAddress})
+            getLocation({departureAddress})
                 .then(response => {
-                    console.log({destinationAddress: response.data});
+                    response.data.predictions.length > 0
+                        ? setListDestinationAddress(
+                              response.data.predictions[0].map(
+                                  add => add.response.data.predictions[0] || '',
+                              ),
+                          )
+                        : setListDestinationAddress([]);
                 })
                 .catch(Err => {
                     console.log({Err});
                 }),
         [destinationAddress],
-        300,
+        500,
     );
-
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.fitToCoordinates(
@@ -141,12 +137,24 @@ export const HomeScreen = () => {
             );
         }
     }, [departureRegion, destinationRegion]);
-    // console.log({
-    //     departureRegion,
-    //     departureAddress,
-    //     destinationRegion,
-    //     destinationAddress,
-    // });
+    useEffect(() => {
+        getAddressFromLocation(
+            departureRegion.latitude,
+            departureRegion.longitude,
+        ).then(vl => setDepartureAddress(vl));
+    }, [departureRegion.latitude, departureRegion.longitude]);
+    useEffect(() => {
+        const origin: Location = {
+            latitude: departureRegion.latitude,
+            longitude: departureRegion.longitude,
+        };
+        const des: Location = {
+            latitude: destinationRegion.latitude,
+            longitude: destinationRegion.longitude,
+        };
+        setDistance(getDistance(origin, des));
+    }, [departureRegion, destinationRegion]);
+
     return (
         <>
             <View w="100%" h="72" margin={0}>
@@ -201,15 +209,17 @@ export const HomeScreen = () => {
                                     onChangeText={setDepartureAddress}
                                 />
                                 <FlatList
-                                    data={[]}
+                                    data={listOriginAddress}
                                     renderItem={item => (
-                                        <Text>{item.item}</Text>
+                                        <Text onPress={() => console.log(item)}>
+                                            {item.item}
+                                        </Text>
                                     )}
                                     w="full"
                                     style={{
                                         position: 'absolute',
-                                        top: 50,
-                                        zIndex: 40,
+                                        top: 110,
+                                        zIndex: 100,
                                         backgroundColor: '#F43',
                                         borderRadius: 7,
                                     }}
@@ -234,7 +244,7 @@ export const HomeScreen = () => {
                                     onChangeText={setDestinationAddress}
                                 />
                                 <FlatList
-                                    data={[]}
+                                    data={listDestinationAddress}
                                     renderItem={item => (
                                         <Text>{item.item}</Text>
                                     )}
@@ -363,13 +373,6 @@ export const HomeScreen = () => {
                                         optimizeWaypoints={true}
                                     />
                                 )}
-                            {dataRoute.poylines.length > 0 && (
-                                <Polyline
-                                    coordinates={dataRoute.poylines}
-                                    strokeColor="red"
-                                    strokeWidth={3}
-                                />
-                            )}
                         </MapView>
                         <Center
                             style={{
@@ -377,12 +380,27 @@ export const HomeScreen = () => {
                                 width: '100%',
                                 bottom: 0,
                             }}>
-                            <BookingModal
-                                customerId={user?.user?.id}
-                                origin={'departureAddress'}
-                                destination={'destinationAddress'}
-                                distance={7}
-                            />
+                            {departureRegion.latitude &&
+                                destinationRegion.latitude && (
+                                    <BookingModal
+                                        customerId={user?.user?.id}
+                                        originAddress={departureAddress}
+                                        originlongitude={
+                                            departureRegion.longitude
+                                        }
+                                        originLatitude={
+                                            departureRegion.latitude
+                                        }
+                                        destinationLatitude={
+                                            destinationRegion.latitude
+                                        }
+                                        destinationLongitude={
+                                            departureRegion.longitude
+                                        }
+                                        destinationAddress={destinationAddress}
+                                        distance={distance}
+                                    />
+                                )}
                         </Center>
                     </View>
                 </View>

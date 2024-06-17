@@ -56,8 +56,8 @@ export default class User extends Model {
     @Column({ type: DataType.DATE })
     dob?: Date;
 
-    @Column({ type: DataType.BOOLEAN })
-    statusDriver: boolean;
+    @Column({ type: DataType.STRING })
+    statusDriver: string;
 
     @Column({ type: DataType.STRING })
     avatar?: string;
@@ -110,8 +110,11 @@ export default class User extends Model {
     @HasMany(() => RouteDriver)
     routeDriver: RouteDriver[];
 
-    @HasMany(() => Notification)
-    notification: Notification[];
+    @HasMany(() => Notification, "receiverId")
+    receiverNotification: Notification[];
+
+    @HasMany(() => Notification, "senderId")
+    senderNotification: Notification[];
 
     @BeforeUpdate
     @BeforeCreate

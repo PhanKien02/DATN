@@ -2,22 +2,21 @@ import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 import {useGetDirectionsQuery} from '../services/api';
+import {getPreciseDistance} from 'geolib';
 // const client = new Client();
 Geocoder.init(API_GG_MAP_KEY);
-interface PositionProps {
+export interface Location {
     latitude: number;
     longitude: number;
-    heading: number;
 }
 
-export const getCurrentPosition = (): Promise<PositionProps> =>
+export const getCurrentPosition = (): Promise<Location> =>
     new Promise((resolve, reject) => {
         Geolocation.getCurrentPosition(
             position => {
-                const cords: PositionProps = {
+                const cords: Location = {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
-                    heading: position?.coords?.heading,
                 };
                 return resolve(cords);
             },
@@ -42,14 +41,13 @@ export const getAddressFromLocation = async (
     var addressComponent = data.results[0].formatted_address;
     return addressComponent;
 };
-export const trackingLocation = (): Promise<PositionProps> =>
+export const trackingLocation = (): Promise<Location> =>
     new Promise((resolve, reject) => {
         Geolocation.watchPosition(
             position => {
-                const cords: PositionProps = {
+                const cords: Location = {
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude,
-                    heading: position?.coords?.heading,
                 };
                 return resolve(cords);
             },
@@ -66,8 +64,9 @@ export const trackingLocation = (): Promise<PositionProps> =>
         );
     });
 export const getDirections = async (origin: string, destination: string) => {
-    const {data, error} = useGetDirectionsQuery({origin, destination});
-    console.log({data, error});
+    console.log({origin, destination});
+
+    const {data} = useGetDirectionsQuery({origin, destination});
     const listPoyline = data.routes[0].legs[0].steps.map(step => {
         return [
             {
@@ -86,6 +85,20 @@ export const getDirections = async (origin: string, destination: string) => {
 
     const distance = data.route.legs[0].distance.text;
     const duration = data.route.legs[0].duration.text;
+    console.log({poylines, distance, duration});
 
     return {poylines, distance, duration};
+};
+
+export const getDistance = (origin: Location, des: Location) => {
+    return getPreciseDistance(
+        {
+            latitude: `${origin.latitude}`,
+            longitude: `${origin.longitude}`,
+        },
+        {
+            latitude: `${des.latitude}`,
+            longitude: `${des.longitude}`,
+        },
+    );
 };

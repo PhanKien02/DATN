@@ -1,10 +1,10 @@
 import "dotenv/config";
 import userRepository from "../repositories/userRepository";
 import { compare } from "bcryptjs";
-import { BadRequestError, NotFoundError } from "../utils/httpErrors";
+import { BadRequestError } from "../utils/httpErrors";
 import { signToken } from "../utils/auth/jwt";
-import { Login, UserPayLoad, UserResponse } from "../types/User";
-import { Op } from "sequelize";
+import { IUser, Login, UserPayLoad } from "../types/User";
+import { Op, QueryTypes, Sequelize, where } from "sequelize";
 import { tranformModel } from "./helper/tranformModelToObject";
 import authorityRepository from "../repositories/authorityRepository";
 import { database } from "../configs/database";
@@ -17,6 +17,8 @@ import districtsRepository from "../repositories/districtsRepository";
 import provinceRepository from "../repositories/provinceRepository";
 import { SubjectEmail } from "../constants/email";
 import { UserRoles } from "../domain/Enums/userRoles";
+import routeDriverRepository from "../repositories/routeDriverRepository";
+import { StatusDriver } from "../constants/statusDriver";
 
 class userService {
     async signUp(newUser: UserPayLoad) {
@@ -41,7 +43,9 @@ class userService {
                 activated: false,
                 roleId: role.toJSON().id,
                 statusDriver:
-                    newUser.roleName === UserRoles.DRIVER ? true : null,
+                    newUser.roleName === UserRoles.DRIVER
+                        ? StatusDriver.FREE
+                        : null,
                 activeKey: otp,
             });
             await mailService.sendmail(
@@ -76,8 +80,6 @@ class userService {
             login.password,
             user.toJSON().password
         );
-        if (!user.toJSON().activated)
-            throw new BadRequestError("Tài Khoản Của Bạn Đã Bị Khóa");
         if (!checkPassword)
             throw new BadRequestError("Email Hoặc Mật Khẩu Không Chính Xác");
         const token = signToken({
@@ -128,11 +130,7 @@ class userService {
         });
         return newUser;
     }
-    async getAllUser(
-        limit: number,
-        page: number,
-        search?: string
-    ): Promise<UserResponse> {
+    async getAllUser(search?: string): Promise<IUser[]> {
         const query = {};
         if (search)
             query["where"] = {
@@ -149,9 +147,7 @@ class userService {
                     },
                 ],
             };
-        query["limit"] = limit;
-        query["offset"] = (page - 1) * limit;
-        const { rows, count } = await userRepository.findAndCountAll({
+        const { rows } = await userRepository.findAndCountAll({
             ...query,
             include: [
                 {
@@ -183,12 +179,7 @@ class userService {
             };
         });
 
-        return {
-            users: users,
-            limit: limit,
-            page: page,
-            totalPage: Math.ceil(count / limit),
-        };
+        return users;
     }
     async updateStaff(user: User, userUpdate: UserPayLoad) {
         const userForUpdate = await userRepository.findByPk(userUpdate.id);
@@ -278,6 +269,39 @@ class userService {
             await t.rollback();
             throw new BadRequestError("Resend OTP Thất Bại");
         }
+    }
+    async searchDrivingAround(lat: number, long: number) {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() - 60 * 5);
+        const later = now.toISOString().slice(0, 19).replace("T", " ");
+        const drivers = await userRepository.findAll({
+            include: [
+                {
+                    model: routeDriverRepository,
+                    where: {
+                        lat: {
+                            [Op.between]: [lat - 0.00872, lat + 0.00872],
+                        },
+                        long: {
+                            [Op.between]: [long - 0.00872, long + 0.00872],
+                        },
+                        time: {
+                            [Op.gte]: later,
+                        },
+                    },
+                },
+                {
+                    model: authorityRepository,
+                    where: {
+                        name: UserRoles.DRIVER,
+                    },
+                },
+            ],
+            where: {
+                statusDriver: StatusDriver.FREE,
+            },
+        });
+        return drivers;
     }
 }
 export default new userService();

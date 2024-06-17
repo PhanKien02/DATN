@@ -1,60 +1,12 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {Image} from '../interface/image';
-import {IUser} from '../interface/user';
+import {IBooking} from '../interface/booking';
 
-interface bookingState {
-    id?: number;
-
-    date: string;
-
-    statused: string;
-
-    cancelReason: string;
-
-    rate: number;
-
-    totalPayment: number;
-
-    longDistance: number;
-
-    paymentStatus: boolean;
-
-    pick_up_point: string;
-
-    dropOffPoint: string;
-
-    vehicleReceiptImage?: Image[];
-
-    driverId: number;
-
-    customerId: number;
+interface bookinSlice {
+    booking: IBooking | null;
 }
-const initialState: bookingState = {
-    id: undefined,
 
-    date: '',
-
-    statused: '',
-
-    cancelReason: '',
-
-    rate: 0,
-
-    totalPayment: 0,
-
-    longDistance: 0,
-
-    paymentStatus: false,
-
-    pick_up_point: '',
-
-    dropOffPoint: '',
-
-    vehicleReceiptImage: [],
-
-    driverId: 0,
-
-    customerId: 0,
+const initialState: bookinSlice = {
+    booking: null,
 };
 
 export const bookingSlice = createSlice({
@@ -62,7 +14,7 @@ export const bookingSlice = createSlice({
     initialState,
     reducers: {
         BOOKING: (state, action) => {
-            state = action.payload;
+            state.booking = action.payload;
         },
     },
 });

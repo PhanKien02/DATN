@@ -8,13 +8,16 @@ import { toast } from "react-toastify";
 import { LoginPayLoad, LoginResponse } from "../models/user.model";
 import authService from "../services/authService";
 import cookiesService from "../services/cookiesService";
+import { useEffect, useState } from "react";
+import { getTokenFcm } from "../utils/firebase/getTokenFcm";
 
 export const LoginPage = () => {
+     const [fcmId, setFcmId] = useState<string | undefined>();
      const { setUserLogin } = useAuthContext();
      const navigate = useNavigate();
      const onFinish = async (login: LoginPayLoad) => {
           await authService
-               .login(login)
+               .login({ ...login, fcmId: fcmId || "" })
                .then((data: LoginResponse) => {
                     cookiesService.setCookie("token", data.token.token);
                     cookiesService.setCookie("refrestToken", data.refreshToken);
@@ -29,7 +32,9 @@ export const LoginPage = () => {
                     else toast.error("Login Error");
                });
      };
-
+     useEffect(() => {
+          getTokenFcm().then((token) => setFcmId(token));
+     }, []);
      return (
           <>
                <div className="flex h-full justify-between items-center gap-5">
@@ -73,7 +78,7 @@ export const LoginPage = () => {
                                              },
                                         ]}
                                    >
-                                        <Input.Password />
+                                        <Input.Password autoComplete="on" />
                                    </Form.Item>
                                    <Form.Item className="w-full flex justify-center">
                                         <Button

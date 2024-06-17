@@ -1,7 +1,17 @@
 import { BaseRouter } from "./BaseRouter";
 import catchAsync from "../utils/catchAsync";
 import { veryfyToken } from "../middleware/verifyToken";
-import { booking, cancelBooking } from "../controllers/booking.controller";
+import {
+    acceptBooking,
+    assignDriver,
+    booking,
+    cancelBooking,
+    completeBooking,
+    getAllbooking,
+    getBookingById,
+    rejectBooking,
+    startMoving,
+} from "../controllers/booking.controller";
 
 /**
  * @description AuthLoginRouter
@@ -17,9 +27,14 @@ class BookingRouter extends BaseRouter {
      */
     protected init() {
         this.router.post("/", catchAsync(booking));
+        this.router.get("/", catchAsync(getAllbooking));
+        this.router.get("/byId", catchAsync(getBookingById));
         this.router.get("/cancel", catchAsync(cancelBooking));
-
-        this.router.use(veryfyToken);
+        this.router.put("/assign", catchAsync(assignDriver));
+        this.router.put("/reject", catchAsync(rejectBooking));
+        this.router.put("/accept", catchAsync(acceptBooking));
+        this.router.put("/moving", catchAsync(startMoving));
+        this.router.put("/complete", catchAsync(completeBooking));
     }
 }
 

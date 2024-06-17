@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGetAllUsers from "../hook/useGetUser";
-import { Button, Spin } from "antd";
+import { Button, Spin, Tabs } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { IUser } from "../models/user.model";
 import { Pagination } from "antd";
@@ -17,13 +17,13 @@ import { toast } from "react-toastify";
 import { UserRoles } from "../utils/userRole";
 const UserManagerPage = () => {
      const { Search } = Input;
-     const [page, setPage] = useState(1);
-     const [limit, setLimit] = useState(10);
+     // const [page, setPage] = useState(1);
+     // const [limit, setLimit] = useState(10);
      const [search, setSearch] = useState("");
-     const { users, isLoading, refetch } = useGetAllUsers(page, limit, search);
+     const { users, isLoading, refetch } = useGetAllUsers(search);
      useEffect(() => {
           refetch();
-     }, [users, refetch, page, limit, search]);
+     }, [users, refetch, search]);
      const onSearch = (value: string) => {
           setSearch(value);
      };
@@ -219,24 +219,27 @@ const UserManagerPage = () => {
                               style={{ width: 400 }}
                               size="large"
                          />
-                         <Table
-                              className="h-full w-full mt-6"
-                              columns={columns}
-                              dataSource={users.users}
-                              pagination={false}
-                         />
-                         <Pagination
-                              className="!mr-5 !mt-10"
-                              showSizeChanger
-                              defaultCurrent={page}
-                              pageSize={limit}
-                              total={users.totalPage}
-                              onChange={(current, pageSize) => {
-                                   setPage(current);
-                                   setLimit(pageSize);
-                              }}
-                         />
                     </div>
+                    <Tabs
+                         type="card"
+                         items={Object.values(UserRoles).map((role) => {
+                              return {
+                                   label: role,
+                                   key: role,
+                                   children: (
+                                        <>
+                                             <Table
+                                                  columns={columns}
+                                                  dataSource={users.filter(
+                                                       (us) => us.role === role
+                                                  )}
+                                                  pagination={false}
+                                             />
+                                        </>
+                                   ),
+                              };
+                         })}
+                    />
                </div>
           </>
      );

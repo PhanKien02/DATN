@@ -1,12 +1,14 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
-const url = 'http://192.168.1.22:8000/api/';
+const url =
+    'https://b828-2402-800-6294-97b-45c-c5ac-79cc-ca2b.ngrok-free.app/api/';
 export const api = createApi({
     // Tương tự tên Slice khi tạo Slice thông thường
     reducerPath: 'api',
     // Cấu hình chung cho tất cả request
     baseQuery: fetchBaseQuery({
         baseUrl: '',
+        timeout: 1000 * 60 * 3,
         prepareHeaders: (headers, {getState}) => {
             // getState() giúp lấy ra toàn bộ state trong store
             // getState().user lấy ra state trong userSlice
@@ -16,7 +18,6 @@ export const api = createApi({
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`);
             }
-
             return headers;
         },
     }),
@@ -61,14 +62,14 @@ export const api = createApi({
         }),
         searchAddress: builder.mutation({
             query: ({search}) => ({
-                url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${search}&key=AIzaSyDTG54SAIAXyrtxlDvnx7mHHnqzexM0law`,
+                url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${search}&key=${API_GG_MAP_KEY}`,
                 method: 'GET',
             }),
         }),
 
         getDirections: builder.query({
             query: ({origin, destination}) => ({
-                url: `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=AIzaSyDTG54SAIAXyrtxlDvnx7mHHnqzexM0law`,
+                url: `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${API_GG_MAP_KEY}`,
                 method: 'GET',
             }),
         }),
@@ -109,6 +110,50 @@ export const api = createApi({
                 method: 'GET',
             }),
         }),
+        trackingLocationDriver: builder.mutation({
+            query: ({id, lat, long}) => ({
+                url: `${url}route/`,
+                method: 'POST',
+                body: {id, lat, long},
+            }),
+        }),
+        rejectBooking: builder.mutation({
+            query: ({bookingId, driverId}) => ({
+                url: `${url}/booking/reject`,
+                body: {bookingId, driverId},
+                method: 'PUT',
+            }),
+        }),
+        getBookingById: builder.query({
+            query: ({bookingId}) => ({
+                url: `${url}/booking/byId`,
+                params: {bookingId},
+                method: 'GET',
+            }),
+        }),
+
+        acceptBooking: builder.mutation({
+            query: ({bookingId, driverId}) => ({
+                url: `${url}/booking/accept`,
+                body: {bookingId, driverId},
+                method: 'PUT',
+            }),
+        }),
+
+        startMoing: builder.mutation({
+            query: ({bookingId, images}) => ({
+                url: `${url}/booking/moving`,
+                body: {bookingId, images},
+                method: 'PUT',
+            }),
+        }),
+        completeMoving: builder.mutation({
+            query: ({bookingId, idDriver}) => ({
+                url: `${url}/booking/complete`,
+                body: {bookingId, idDriver},
+                method: 'PUT',
+            }),
+        }),
     }),
 });
 export const {
@@ -124,4 +169,10 @@ export const {
     useGetLocationFromAddressMutation,
     useBookingMutation,
     useCancelBookingMutation,
+    useTrackingLocationDriverMutation,
+    useRejectBookingMutation,
+    useGetBookingByIdQuery,
+    useAcceptBookingMutation,
+    useStartMoingMutation,
+    useCompleteMovingMutation,
 } = api;

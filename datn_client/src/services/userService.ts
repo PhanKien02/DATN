@@ -3,9 +3,9 @@ import baseRequest from "./baseRequest";
 
 class UserService {
      private BasseUrl = import.meta.env.FE_BASE_API_URL + "users";
-     async getAllUser(page: number, limit: number, search: string) {
+     async getAllUser(search: string) {
           const response = await baseRequest.get(this.BasseUrl, {
-               params: { page, limit, search },
+               params: { search },
           });
           return response.data;
      }
@@ -26,6 +26,13 @@ class UserService {
           await baseRequest.get(this.BasseUrl + "/active", {
                params: { userId, isActive },
           });
+     }
+
+     async searchDrivingAround(lat: number, long: number) {
+          const res = await baseRequest.get(this.BasseUrl + "/driver", {
+               params: { lat, long },
+          });
+          return res.data;
      }
 }
 

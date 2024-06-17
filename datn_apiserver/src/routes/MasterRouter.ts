@@ -9,6 +9,8 @@ import provinceRouter from "./provinceRouter";
 import promotionRouter from "./promotionRouter";
 import unitPriceRouter from "./unitPriceRouter";
 import bookingRouter from "./bookingRouter";
+import routeDriver from "./routerDriverRouter";
+import { getMessaging } from "firebase-admin/messaging";
 
 class MasterRouter extends BaseRouter {
     constructor() {
@@ -40,6 +42,7 @@ class MasterRouter extends BaseRouter {
         this.router.use("/promotion", promotionRouter);
         this.router.use("/price", unitPriceRouter);
         this.router.use("/booking", bookingRouter);
+        this.router.use("/route", routeDriver);
         this.router.use(errorHandler);
     }
 }
