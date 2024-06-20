@@ -303,5 +303,45 @@ class userService {
         });
         return drivers;
     }
+
+    async getProfile(user: User) {
+        return await userRepository.findOne({
+            where: { id: user.userId },
+            include: [
+                {
+                    model: wardRepository,
+                    include: [
+                        {
+                            model: districtsRepository,
+                            include: [provinceRepository],
+                        },
+                    ],
+                },
+                authorityRepository,
+            ],
+        });
+    }
+
+    async updateProfile(profile: IUser) {
+        const user = await userRepository.findByPk(profile.id);
+        console.log({ profile, user });
+        if (!user) throw new BadRequestError("Người Dùng Không Tồn Tại");
+
+        await userRepository.update(
+            {
+                email: profile.email,
+                avatar: profile.avatar,
+                fullName: profile.fullName,
+                gender: profile.gender,
+                phone: profile.phone,
+                dob: profile.dob,
+            },
+            {
+                where: {
+                    id: profile.id,
+                },
+            }
+        );
+    }
 }
 export default new userService();

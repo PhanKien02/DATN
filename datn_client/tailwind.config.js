@@ -61,7 +61,7 @@ export default {
                     current: "currentColor",
                     black: "#000000",
                     white: "#ffffff",
-                    yellow: "##ffd700",
+                    yellow: "##eca821",
                     softPurple: "#4A4A6A",
                     success: "#01BF37",
                     grey200: "#8E8EA9",

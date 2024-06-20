@@ -219,8 +219,15 @@ class BookingService {
             include: [
                 {
                     model: userRepository,
+                    association: "customer",
                     as: "customer",
                 },
+                {
+                    model: userRepository,
+                    association: "driver",
+                    as: "driver",
+                },
+                promotionRepository,
             ],
         });
         if (!booking) throw new BadRequestError("Cuốc Xe Không Tồn Tại");
@@ -343,6 +350,11 @@ class BookingService {
                 date: new Date(),
             });
         }
+        if (booking.dataValues.promotion)
+            await promotionRepository.decrement(
+                { amount: 1 },
+                { where: { id: booking.dataValues.promotion.id } }
+            );
         return await Promise.all([
             bookingRepository.update(
                 {

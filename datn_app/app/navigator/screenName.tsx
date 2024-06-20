@@ -12,4 +12,5 @@ export enum screens {
     resetPassword = 'resetPassword',
     income = 'income',
     driver = 'driver',
+    profile = 'profile',
 }

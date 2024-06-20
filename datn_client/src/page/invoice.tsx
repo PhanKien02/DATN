@@ -27,7 +27,7 @@ const InvoiceManagerPage = () => {
                key: "customer",
                fixed: "left",
                render: (_, record) => {
-                    return record.booking.customer.fullName;
+                    return record.booking?.customer.fullName;
                },
           },
           {
@@ -36,7 +36,7 @@ const InvoiceManagerPage = () => {
                dataIndex: "driver",
                key: "driver",
                render: (_, record) => {
-                    return record.booking.driver.fullName;
+                    return record.booking?.driver.fullName;
                },
           },
           {
@@ -44,7 +44,7 @@ const InvoiceManagerPage = () => {
                dataIndex: "longDistance",
                key: "longDistance",
                render: (_, record) => {
-                    return record.booking.longDistance;
+                    return record.booking?.longDistance;
                },
           },
           {
@@ -76,7 +76,7 @@ const InvoiceManagerPage = () => {
                key: "promotion",
                render: (_, record) => {
                     return `${
-                         record.booking.promotion
+                         record.booking?.promotion
                               ? record.booking.promotion.percent
                               : 0
                     } %`;
@@ -147,7 +147,7 @@ const InvoiceManagerPage = () => {
           <>
                <div className="flex flex-col h-full mt-4 ml-1">
                     <div className="flex items-end justify-between">
-                         <h1 className="text-5xl ml-4">Quản Lý Hóa Đơn</h1>
+                         <h1 className="text-4xl ml-4">Hóa Đơn</h1>
                     </div>
                     <div className="flex flex-col items-end w-full">
                          <Search

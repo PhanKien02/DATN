@@ -17,6 +17,8 @@ import {DriverTab} from './driver-navigator';
 import {setUpRootStore} from '../models/root-store/setUp';
 import {SETUP} from '../models/auth-slice';
 import {Loading} from '../components/Loading';
+import {ProfileScreen} from '../screens/profile-screen';
+import {Alert, Button} from 'native-base';
 const Stack = createNativeStackNavigator();
 const RootStack = ({initScreen}) => {
     return (
@@ -65,6 +67,14 @@ const RootStack = ({initScreen}) => {
                 component={DriverTab}
                 options={{
                     headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name={screens.profile}
+                component={ProfileScreen}
+                options={{
+                    headerShown: true,
+                    title: 'Thông tin cá nhân',
                 }}
             />
         </Stack.Navigator>

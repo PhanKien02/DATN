@@ -32,6 +32,8 @@ interface Props {
     originLatitude: number;
     destinationLatitude: number;
     distance: number;
+    setShowModalFindDriver: any;
+    setBkId: any;
 }
 export const BookingModal = ({
     originAddress,
@@ -42,16 +44,17 @@ export const BookingModal = ({
     destinationLatitude,
     destinationLongitude,
     customerId,
+    setShowModalFindDriver,
+    setBkId,
 }: Props) => {
     const dispath = useAppDispatch();
     const [showModal, setShowModal] = useState(false);
     const [booking, {error, isLoading}] = useBookingMutation();
-    const [showModalFindDriver, setShowModalFindDriver] = useState(false);
+
     const [total, setTotal] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [totalPayment, setTotalPayment] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState('Tiền Mặt');
-    const [paymentStatus, setPaymentStatus] = useState(false);
     const [promotionId, setPromotionId] = useState<number | undefined>();
     const [errMes, setErrorMes] = useState('');
     const {data: dataPromotion, refetch: refetchPromotion} =
@@ -90,7 +93,6 @@ export const BookingModal = ({
             customerId: customerId,
             originAddress: originAddress,
             destinationAddress: destinationAddress,
-            paymentStatus: paymentStatus,
             totalPayment: totalPayment,
             longDistance: distance / 1000,
             paymentMethod: paymentMethod,
@@ -105,12 +107,9 @@ export const BookingModal = ({
             .unwrap()
             .then(data => {
                 if (!error) {
-                    dispath(BOOKING(data));
-
-                    save(KeyAsyncStorage.BOOKING, data).then(() => {
-                        setShowModalFindDriver(true);
-                        setShowModal(false);
-                    });
+                    setShowModalFindDriver(true);
+                    setBkId(data.id);
+                    setShowModal(false);
                 } else {
                     setErrorMes(
                         error['data'].message ||
@@ -140,7 +139,7 @@ export const BookingModal = ({
                     opacity={0.8}
                     backgroundColor="#FBC632">
                     <Text fontWeight="bold" color="#fff">
-                        Đơn Hàng
+                        Bắt Đầu
                     </Text>
                 </Button>
                 <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
@@ -186,7 +185,7 @@ export const BookingModal = ({
                                         })}
                                     </Select>
                                 </FormControl>
-                                <FormControl>
+                                {/* <FormControl>
                                     <FormControl.Label>
                                         Phương Thức Thanh Toán
                                     </FormControl.Label>
@@ -202,7 +201,7 @@ export const BookingModal = ({
                                             value="Chuyển Khoản"
                                         />
                                     </Select>
-                                </FormControl>
+                                </FormControl> */}
                             </View>
                             <View mt={3}>
                                 <Text fontWeight="bold" color="#F43">
@@ -251,7 +250,7 @@ export const BookingModal = ({
                                         VNĐ
                                     </Text>
                                 </Flex>
-                                <Flex
+                                {/* <Flex
                                     ml={2}
                                     style={{
                                         gap: 5,
@@ -263,7 +262,7 @@ export const BookingModal = ({
                                         Phương Thức Thanh Toán :
                                     </Text>
                                     <Text>{paymentMethod}</Text>
-                                </Flex>
+                                </Flex> */}
                             </View>
                             {errMes && (
                                 <Text color={'#f43'} textAlign="center" mt={1}>
@@ -296,12 +295,6 @@ export const BookingModal = ({
                     </Modal.Content>
                 </Modal>
             </Center>
-
-            <FindDriverModal
-                open={showModalFindDriver}
-                setOpen={setShowModalFindDriver}
-                setShowBooking={setShowModal}
-            />
         </>
     );
 };

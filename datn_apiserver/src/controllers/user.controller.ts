@@ -72,3 +72,18 @@ export const searchDrivingAround = async (
     const response = await userService.searchDrivingAround(+lat, +long);
     return res.status(httpStatus.OK).send(response);
 };
+
+export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
+    const user = req.user;
+    const response = await userService.getProfile(user);
+    return res.status(httpStatus.OK).send(response);
+};
+export const updateProfile = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    const profile = req.body.profile;
+
+    await userService.updateProfile(profile);
+    return res.status(httpStatus.OK).send();
+};

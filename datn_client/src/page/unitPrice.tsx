@@ -57,7 +57,7 @@ const UnitPriceManagerPage = () => {
           <>
                <div className="flex flex-col h-full mt-4 ml-1">
                     <div className="flex items-end justify-between">
-                         <h1 className="text-5xl ml-4">Đơn Giá</h1>
+                         <h1 className="text-4xl ml-4">Đơn Giá</h1>
                          <UnitPriceModal
                               refetch={refetch}
                               icon={<IoMdAdd />}

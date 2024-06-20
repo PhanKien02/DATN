@@ -14,6 +14,7 @@ import UserModal from "../modals/userModal";
 import { userService } from "../services/userService";
 import { toast } from "react-toastify";
 import { UserRoles } from "../utils/userRole";
+import { FaEye } from "react-icons/fa";
 const UserManagerPage = () => {
      const { Search } = Input;
      const [search, setSearch] = useState("");
@@ -99,31 +100,7 @@ const UserManagerPage = () => {
                          : "N/A";
                },
           },
-          {
-               title: "Chức Vụ",
-               dataIndex: "role",
-               key: "role",
-               render: (_, data) => {
-                    return data.role || "N/A";
-               },
-               filters: [
-                    {
-                         text: "Admin",
-                         value: UserRoles.ADMIN,
-                    },
-                    {
-                         text: "Người Dùng",
-                         value: UserRoles.USER,
-                    },
-                    {
-                         text: "Tài Xế",
-                         value: UserRoles.DRIVER,
-                    },
-               ],
-               onFilter(value, record) {
-                    return record.role === value;
-               },
-          },
+
           {
                title: "Trạng Thái",
                dataIndex: "activated",
@@ -179,18 +156,18 @@ const UserManagerPage = () => {
                                    )}
                               </span>
                          </Button>
-                         <div>
-                              <UserModal
-                                   icon={<FaUserEdit />}
-                                   refetch={refetch}
-                                   userData={record}
-                              />
-                         </div>
-                         {/* <div>
-                              <Button danger block type="primary">
-                                   <MdDeleteForever />
-                              </Button>
-                         </div> */}
+                         <Button type="primary">
+                              <FaEye />
+                         </Button>
+                         {record.role === UserRoles.ADMIN && (
+                              <div>
+                                   <UserModal
+                                        icon={<FaUserEdit />}
+                                        refetch={refetch}
+                                        userData={record}
+                                   />
+                              </div>
+                         )}
                     </div>
                ),
           },
@@ -201,7 +178,7 @@ const UserManagerPage = () => {
           <>
                <div className="flex flex-col h-full mt-4 ml-1">
                     <div className="flex items-end justify-between">
-                         <h1 className="text-5xl  ml-4">Nhân viên</h1>
+                         <h1 className="text-4xl  ml-4">Người Dùng</h1>
                          <UserModal
                               title="Thêm Nhân Viên"
                               icon={<IoPersonAddSharp />}
@@ -222,7 +199,12 @@ const UserManagerPage = () => {
                          type="card"
                          items={Object.values(UserRoles).map((role) => {
                               return {
-                                   label: role,
+                                   label:
+                                        role === UserRoles.ADMIN
+                                             ? "Quản Trị Viên"
+                                             : role === UserRoles.DRIVER
+                                             ? "Tài Xế"
+                                             : "Khách Hàng",
                                    key: role,
                                    children: (
                                         <>

@@ -139,9 +139,7 @@ const PromotionManagerPage = () => {
           <>
                <div className="flex flex-col h-full mt-4 ml-1">
                     <div className="flex items-end justify-between">
-                         <h1 className="text-5xl ml-4">
-                              Chương Trình Khuyến Mãi
-                         </h1>
+                         <h1 className="text-4xl ml-4">Khuyến Mãi</h1>
                          <PromotionModal
                               title="Thêm Chương Trình Khuyến Mãi"
                               icon={<IoMdAdd />}

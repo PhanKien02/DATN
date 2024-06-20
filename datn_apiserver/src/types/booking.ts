@@ -1,8 +1,10 @@
 import { User } from "../utils/user";
+import { IUser } from "./User";
 import { Image } from "./image";
+import { IPromotion } from "./promotion";
 
 export interface IBooking {
-    id?: number;
+    id: number;
 
     date: Date;
 
@@ -18,8 +20,6 @@ export interface IBooking {
 
     paymentStatus: boolean;
 
-    originLocaition: number;
-
     originAddress: string;
 
     originlongitude: number;
@@ -30,15 +30,15 @@ export interface IBooking {
 
     vehicleReceiptImage?: Image[];
 
-    customer: User;
+    customer: IUser;
+
+    driver: IUser;
+
+    driverId: number;
 
     customerId: number;
 
-    promotionId: number;
-
-    destinationLatitude: number;
-
-    destinationLongitude: number;
+    promotion?: IPromotion;
 }
 export interface BookingPayLoad {
     customerId: number;

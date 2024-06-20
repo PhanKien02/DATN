@@ -239,9 +239,6 @@ function RegisterScreen({navigation}: any) {
                                 required: 'Vui Lòng Chọn Vài Trò Muốn Đăng Ký',
                             }}
                         />
-                        <FormControl.ErrorMessage>
-                            {errors.password?.message}
-                        </FormControl.ErrorMessage>
                     </FormControl>
                     {error && (
                         <Center>

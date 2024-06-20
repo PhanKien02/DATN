@@ -78,18 +78,16 @@ export default class Firebase {
             callback(remoteMessage);
         });
 
-    static uploadFiles = async (imagePath: string[]) => {
+    static uploadFiles = async (imagePath: string[], bulk = 'default') => {
         const uploads = [];
         const promises = [];
         imagePath.forEach(file => {
-            const reference = storage().ref(
-                'bookings/' + file.split('/').pop(),
-            ); // 2
+            const reference = storage().ref(bulk + file.split('/').pop()); // 2
             const task = reference
                 .putFile(file)
                 .then(() => {
                     const url = storage()
-                        .ref('bookings/' + file.split('/').pop())
+                        .ref(bulk + file.split('/').pop())
                         .getDownloadURL();
                     uploads.push(url);
                 })

@@ -8,20 +8,16 @@ import {KeyAsyncStorage} from '../../constants/asyncStorage';
 
 interface Props {
     open: boolean;
+    id: number;
     setOpen: (vl: boolean) => void;
-    setShowBooking: (vl: boolean) => void;
     idBooking?: number;
 }
-export const FindDriverModal = ({open, setOpen, setShowBooking}: Props) => {
+export const FindDriverModal = ({open, setOpen, id}: Props) => {
     const [cancel, setCancel] = useState(false);
     const [reason, setReason] = useState('');
     const [textReason, setTextReason] = useState('');
     const [cancelBooking, {isLoading}] = useCancelBookingMutation();
     const [errorMes, setErrorMes] = useState('');
-    const [id, setId] = useState();
-    useEffect(() => {
-        open && load(KeyAsyncStorage.BOOKING).then(data => setId(data.id));
-    }, [open]);
 
     return (
         <>

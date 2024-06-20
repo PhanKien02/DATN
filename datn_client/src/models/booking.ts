@@ -40,6 +40,7 @@ export interface IBooking {
      customerId: number;
 
      promotion: IPromotion;
+
      unitPrice: IUnitPrice;
 }
 export interface BookingPayLoad {

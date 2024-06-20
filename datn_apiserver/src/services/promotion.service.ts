@@ -2,7 +2,7 @@ import { Op } from "sequelize";
 import promotionRepository from "../repositories/promotionRepository";
 import { BadRequestError } from "../utils/httpErrors";
 import { User } from "../utils/user";
-import { IPromotion } from "../types/Promotion";
+import { IPromotion } from "../types/promotion";
 
 class PromotionService {
     async getAllPromotion() {
@@ -24,6 +24,7 @@ class PromotionService {
                 createdBy: user.userId,
             });
     }
+
     async blockOrActivePromotion(
         user: User,
         promotionId: number,
@@ -51,12 +52,12 @@ class PromotionService {
                     [Op.lte]: km,
                 },
                 status: true,
-                // startDate: {
-                //     [Op.lte]: new Date()
-                //         .toISOString()
-                //         .slice(0, 19)
-                //         .replace("T", " "),
-                // },
+                startDate: {
+                    [Op.lte]: new Date()
+                        .toISOString()
+                        .slice(0, 19)
+                        .replace("T", " "),
+                },
                 expDate: {
                     [Op.gte]: new Date()
                         .toISOString()

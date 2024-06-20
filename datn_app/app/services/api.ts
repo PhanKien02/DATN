@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
-const url = 'https://0880-14-236-44-238.ngrok-free.app/api/';
+const url = 'https://8445-14-236-44-238.ngrok-free.app/api/';
 export const api = createApi({
     // Tương tự tên Slice khi tạo Slice thông thường
     reducerPath: 'api',
@@ -130,6 +130,13 @@ export const api = createApi({
                 method: 'GET',
             }),
         }),
+        _getBookingById: builder.mutation({
+            query: ({bookingId}) => ({
+                url: `${url}/booking/byId`,
+                params: {bookingId},
+                method: 'GET',
+            }),
+        }),
 
         acceptBooking: builder.mutation({
             query: ({bookingId, driverId}) => ({
@@ -150,6 +157,19 @@ export const api = createApi({
             query: ({bookingId, idDriver}) => ({
                 url: `${url}/booking/complete`,
                 body: {bookingId, idDriver},
+                method: 'PUT',
+            }),
+        }),
+        getProfile: builder.query({
+            query: () => ({
+                url: `${url}users/profile`,
+                method: 'GET',
+            }),
+        }),
+        updateProfile: builder.mutation({
+            query: profile => ({
+                url: `${url}users/profile`,
+                body: {profile},
                 method: 'PUT',
             }),
         }),
@@ -174,4 +194,7 @@ export const {
     useAcceptBookingMutation,
     useStartMoingMutation,
     useCompleteMovingMutation,
+    use_getBookingByIdMutation,
+    useGetProfileQuery,
+    useUpdateProfileMutation,
 } = api;

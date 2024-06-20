@@ -34,7 +34,6 @@ function StartScreen({navigation}: any) {
                             },
                             shadowOpacity: 1,
                             shadowRadius: 15.0,
-
                             elevation: 6,
                         }}
                         shadow="9"

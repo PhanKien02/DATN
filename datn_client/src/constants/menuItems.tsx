@@ -21,7 +21,7 @@ export const MenuItems: MenuItems[] = [
           link: "/",
      },
      {
-          title: "Danh Sách Đơn Hàng",
+          title: "Đơn Hàng",
           link: "/don-hang",
           id: "booking",
           icon: FaCar,
@@ -39,7 +39,7 @@ export const MenuItems: MenuItems[] = [
           icon: MdPriceCheck,
      },
      {
-          title: "Khuyễn Mãi",
+          title: "Khuyến Mãi",
           link: "/khuyen-mai",
           id: "promotion",
           icon: MdDiscount,
