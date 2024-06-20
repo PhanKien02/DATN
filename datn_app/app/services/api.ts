@@ -1,7 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
-const url =
-    'https://b828-2402-800-6294-97b-45c-c5ac-79cc-ca2b.ngrok-free.app/api/';
+const url = 'https://8445-14-236-44-238.ngrok-free.app/api/';
 export const api = createApi({
     // Tương tự tên Slice khi tạo Slice thông thường
     reducerPath: 'api',
@@ -33,10 +32,10 @@ export const api = createApi({
         }),
 
         register: builder.mutation({
-            query: ({email, fullName, password, roleName}) => ({
+            query: ({email, fullName, password, roleName, phone}) => ({
                 url: `${url}authenticate/sign-up`,
                 method: 'POST',
-                body: {email, fullName, password, roleName},
+                body: {email, fullName, password, roleName, phone},
             }),
         }),
 
@@ -131,6 +130,13 @@ export const api = createApi({
                 method: 'GET',
             }),
         }),
+        _getBookingById: builder.mutation({
+            query: ({bookingId}) => ({
+                url: `${url}/booking/byId`,
+                params: {bookingId},
+                method: 'GET',
+            }),
+        }),
 
         acceptBooking: builder.mutation({
             query: ({bookingId, driverId}) => ({
@@ -151,6 +157,19 @@ export const api = createApi({
             query: ({bookingId, idDriver}) => ({
                 url: `${url}/booking/complete`,
                 body: {bookingId, idDriver},
+                method: 'PUT',
+            }),
+        }),
+        getProfile: builder.query({
+            query: () => ({
+                url: `${url}users/profile`,
+                method: 'GET',
+            }),
+        }),
+        updateProfile: builder.mutation({
+            query: profile => ({
+                url: `${url}users/profile`,
+                body: {profile},
                 method: 'PUT',
             }),
         }),
@@ -175,4 +194,7 @@ export const {
     useAcceptBookingMutation,
     useStartMoingMutation,
     useCompleteMovingMutation,
+    use_getBookingByIdMutation,
+    useGetProfileQuery,
+    useUpdateProfileMutation,
 } = api;

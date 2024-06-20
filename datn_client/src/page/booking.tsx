@@ -7,10 +7,12 @@ import { formatDateTime } from "../utils/formatDate";
 import { BookingStatus } from "../constants/booking";
 import { MdAssignmentInd } from "react-icons/md";
 import AssignDriverModal from "../modals/assignDriverModal";
-
+import { FaEye } from "react-icons/fa";
+import DetailBooking from "../modals/detailBooking";
 const BookingManagerPage = () => {
      const [limit, setLimit] = useState(10);
      const [openAssignDriverModal, setOpenAssignDriverModal] = useState(false);
+     const [openDetail, setOpenDetail] = useState(false);
      const [data, setData] = useState<IBooking>();
      const [page, setPage] = useState(1);
      const { bookings, isLoading, refetch } = useGetAllBooking(page, limit);
@@ -149,7 +151,7 @@ const BookingManagerPage = () => {
                width: 100,
                render: (_, record) => {
                     return (
-                         <>
+                         <div className="flex gap-2 !mr-2">
                               <Button
                                    type="primary"
                                    onClick={() => {
@@ -169,9 +171,17 @@ const BookingManagerPage = () => {
                                    <span className="mr-1 text-md">
                                         <MdAssignmentInd />
                                    </span>
-                                   <span>Tài Xế</span>
                               </Button>
-                         </>
+                              <Button
+                                   type="primary"
+                                   onClick={() => {
+                                        setOpenDetail(true);
+                                        setData(record);
+                                   }}
+                              >
+                                   <FaEye />
+                              </Button>
+                         </div>
                     );
                },
           },
@@ -180,7 +190,7 @@ const BookingManagerPage = () => {
           <>
                <div className="flex flex-col h-full mt-4 ml-1">
                     <div className="flex items-end justify-between">
-                         <h1 className="text-5xl ml-4">Danh Sách Đơn Hàng</h1>
+                         <h1 className="text-4xl ml-4">Đơn Hàng</h1>
                     </div>
                     <div className="flex flex-col items-end w-full h-full">
                          <Table
@@ -211,6 +221,14 @@ const BookingManagerPage = () => {
                          data={data}
                          open={openAssignDriverModal}
                          setOpen={setOpenAssignDriverModal}
+                    />
+               )}
+
+               {data && (
+                    <DetailBooking
+                         open={openDetail}
+                         setOpen={setOpenDetail}
+                         data={data}
                     />
                )}
           </>

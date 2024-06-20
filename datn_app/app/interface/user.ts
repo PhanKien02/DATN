@@ -1,3 +1,8 @@
+interface IRole {
+    id: number;
+    description: number;
+    name: string;
+}
 export interface IUser {
     id: number;
     email?: string;
@@ -18,9 +23,10 @@ export interface IUser {
 
     wardId?: number;
 
-    roleName?: string;
+    role?: IRole;
 
     fcmId?: string;
 
     statusDriver?: string;
+    roleName?: string;
 }

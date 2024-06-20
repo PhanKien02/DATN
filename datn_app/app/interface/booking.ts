@@ -1,10 +1,11 @@
 import {Image} from './image';
+import {IPromotion} from './promotion';
 import {IUser} from './user';
 
 export interface IBooking {
     id: number;
 
-    date: Date | '';
+    date: Date;
 
     statused: string;
 
@@ -18,8 +19,6 @@ export interface IBooking {
 
     paymentStatus: boolean;
 
-    originLocaition: number;
-
     originAddress: string;
 
     originlongitude: number;
@@ -28,16 +27,21 @@ export interface IBooking {
 
     destinationAddress: string;
 
-    vehicleReceiptImage?: Image[];
-
-    customer?: IUser;
-
-    customerId: number;
-
-    promotionId: number;
     destinationLatitude: number;
 
     destinationLongitude: number;
+
+    vehicleReceiptImage?: Image[];
+
+    customer: IUser;
+
+    driver: IUser;
+
+    driverId: number;
+
+    customerId: number;
+
+    promotion?: IPromotion;
 }
 export interface BookingPayLoad {
     customerId: number;
@@ -50,7 +54,7 @@ export interface BookingPayLoad {
 
     destinationAddress: string;
 
-    paymentStatus: boolean;
+    paymentStatus?: boolean;
 
     totalPayment: number;
 
@@ -58,7 +62,7 @@ export interface BookingPayLoad {
 
     promotionId: number;
 
-    paymentMethod: string;
+    paymentMethod?: string;
 
     unitPriceId: number;
 

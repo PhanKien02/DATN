@@ -12,7 +12,7 @@ import {
 import React from 'react';
 import {UserRoles} from '../models/enums/userRoles';
 import {Controller, useForm} from 'react-hook-form';
-import {isEmail} from '../utils/helpers';
+import {isEmail, isPhone} from '../utils/helpers';
 import {useRegisterMutation} from '../services/api';
 import {Loading} from '../components/Loading';
 import {screens} from '../navigator/screenName';
@@ -29,12 +29,13 @@ function RegisterScreen({navigation}: any) {
             password: '',
             confirmPass: '',
             fullName: '',
+            phone: '',
             roleName: UserRoles.USER,
         },
     });
     const onSubmit = data => {
-        const {email, fullName, password, roleName} = data;
-        register({email, fullName, password, roleName})
+        const {email, fullName, password, roleName, phone} = data;
+        register({email, fullName, password, roleName, phone})
             .unwrap()
             .then(res => {
                 navigation.navigate(screens.verifyOTP, {
@@ -61,7 +62,6 @@ function RegisterScreen({navigation}: any) {
                         color="black"
                         width="full"
                         textAlign="left"
-                        alignItems="start"
                         marginBottom="2">
                         Đăng Ký
                     </Text>
@@ -87,7 +87,36 @@ function RegisterScreen({navigation}: any) {
                             }}
                         />
                         <FormControl.ErrorMessage>
-                            {errors.email?.message}
+                            {errors.fullName?.message}
+                        </FormControl.ErrorMessage>
+                    </FormControl>
+                    <FormControl isRequired isInvalid={'phone' in errors}>
+                        <FormControl.Label>Số Điện Thoại</FormControl.Label>
+                        <Controller
+                            control={control}
+                            render={({field: {onChange, onBlur, value}}) => (
+                                <Input
+                                    keyboardType="numeric"
+                                    onBlur={onBlur}
+                                    placeholder="Nhập Số Điện Thoại"
+                                    onChangeText={val => onChange(val)}
+                                    value={value}
+                                    my="2"
+                                    w="90%"
+                                    borderRadius="20"
+                                    type="text"
+                                />
+                            )}
+                            name="phone"
+                            rules={{
+                                required: 'Vui Lòng Nhập Số Điện Thoại',
+                                validate: value =>
+                                    isPhone(value) ||
+                                    'Số Điện Thoại Không Đúng Định Dạng',
+                            }}
+                        />
+                        <FormControl.ErrorMessage>
+                            {errors.fullName?.message}
                         </FormControl.ErrorMessage>
                     </FormControl>
                     <FormControl isRequired isInvalid={'email' in errors}>
@@ -110,7 +139,8 @@ function RegisterScreen({navigation}: any) {
                             rules={{
                                 required: 'Vui Lòng Nhập Email',
                                 validate: value =>
-                                    isEmail(value) || 'Invalid email format',
+                                    isEmail(value) ||
+                                    'Email Không đúng định dạng',
                             }}
                         />
                         <FormControl.ErrorMessage>
@@ -209,9 +239,6 @@ function RegisterScreen({navigation}: any) {
                                 required: 'Vui Lòng Chọn Vài Trò Muốn Đăng Ký',
                             }}
                         />
-                        <FormControl.ErrorMessage>
-                            {errors.password?.message}
-                        </FormControl.ErrorMessage>
                     </FormControl>
                     {error && (
                         <Center>

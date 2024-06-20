@@ -12,12 +12,16 @@ import {IBooking} from '../../interface/booking';
 import {CameraComponent} from '../cameraComponent';
 import Firebase from '../../utils/firebase';
 import {BookingStatus} from '../../constants/booking';
-
+import {useAppDispatch} from '../../models/root-store/root-store';
+import {BOOKING} from '../../models/booking-slice';
+import {Rating, AirbnbRating} from 'react-native-ratings';
+const WATER_IMAGE = require('./water.png');
 interface Props {
     bookingId: number;
-    idDriver: number;
+    idDriver?: number;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isUser?: boolean;
 }
 
 export const InforBookingModal = ({
@@ -25,7 +29,9 @@ export const InforBookingModal = ({
     open,
     setOpen,
     idDriver,
+    isUser = false,
 }: Props) => {
+    const dispath = useAppDispatch();
     const [booking, setBooking] = useState<IBooking | null>(null);
     const [startMoving] = useStartMoingMutation();
     const [completeBooking] = useCompleteMovingMutation();
@@ -38,7 +44,7 @@ export const InforBookingModal = ({
         setBooking(data);
     }, [data]);
 
-    const hanleStartMoving = async () => {
+    const DriverAction = async () => {
         if (photoPath.length < 5)
             Toast.show({
                 type: 'error',
@@ -47,7 +53,7 @@ export const InforBookingModal = ({
         else {
             if (booking.statused == BookingStatus.DRIVER_ACCEPTED) {
                 const imagePath = photoPath.map(path => path.uri);
-                const urls = (await Firebase.uploadFiles(imagePath))
+                const urls = (await Firebase.uploadFiles(imagePath, 'bookings'))
                     .map(url => url._j)
                     .filter(url => url != null);
                 startMoving({bookingId, images: urls}).then(() => {
@@ -57,11 +63,10 @@ export const InforBookingModal = ({
             }
             if (booking.statused === BookingStatus.MOVING) {
                 completeBooking({bookingId, idDriver});
+                dispath(BOOKING(null));
             }
         }
     };
-    console.log({idDriver});
-
     return (
         <>
             <>
@@ -83,7 +88,7 @@ export const InforBookingModal = ({
                                     <View
                                         w="full"
                                         style={{
-                                            gap: 3,
+                                            gap: 5,
                                             display: 'flex',
                                             flexDirection: 'row',
                                             justifyContent: 'space-between',
@@ -93,6 +98,37 @@ export const InforBookingModal = ({
                                         </Text>
                                         <Text>{booking.customer.fullName}</Text>
                                     </View>
+                                    <View
+                                        w="full"
+                                        style={{
+                                            gap: 3,
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            justifyContent: 'space-between',
+                                        }}>
+                                        <Text fontWeight="bold">
+                                            Số Điện Thoại:
+                                        </Text>
+                                        <Text>{booking.customer.phone}</Text>
+                                    </View>
+                                    {isUser && (
+                                        <View
+                                            w="full"
+                                            style={{
+                                                gap: 3,
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-between',
+                                            }}>
+                                            <Text fontWeight="bold">
+                                                Tài Xế
+                                            </Text>
+                                            <Text>
+                                                {booking.driver &&
+                                                    booking.driver.fullName}
+                                            </Text>
+                                        </View>
+                                    )}
                                     <View
                                         w="full"
                                         style={{
@@ -155,26 +191,51 @@ export const InforBookingModal = ({
                                             VNĐ
                                         </Text>
                                     </View>
-                                    <CameraComponent
-                                        photoPath={photoPath}
-                                        setPhotoPath={setPhotoPath}
-                                    />
+                                    {!isUser ? (
+                                        <CameraComponent
+                                            photoPath={photoPath}
+                                            setPhotoPath={setPhotoPath}
+                                        />
+                                    ) : (
+                                        <>
+                                            <Rating
+                                                type="heart"
+                                                ratingCount={3}
+                                                imageSize={60}
+                                                showRating
+                                            />
+                                        </>
+                                    )}
                                 </View>
                             )}
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button
-                                w="full"
-                                borderRadius={10}
-                                colorScheme="green"
-                                onPress={hanleStartMoving}>
-                                <Text fontWeight="bold" color={'#fff'}>
-                                    {booking &&
-                                    booking.statused != BookingStatus.MOVING
-                                        ? 'Bắt Đầu Di Chuyển'
-                                        : 'Thanh Toán Và Hoàn Thành Chuyến Đi'}
-                                </Text>
-                            </Button>
+                            {!isUser ? (
+                                <Button
+                                    w="full"
+                                    borderRadius={10}
+                                    colorScheme="green"
+                                    onPress={DriverAction}>
+                                    <Text fontWeight="bold" color={'#fff'}>
+                                        {booking &&
+                                        booking.statused != BookingStatus.MOVING
+                                            ? 'Bắt Đầu Di Chuyển'
+                                            : 'Thanh Toán Và Hoàn Thành Chuyến Đi'}
+                                    </Text>
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        w="full"
+                                        borderRadius={10}
+                                        colorScheme="green"
+                                        onPress={DriverAction}>
+                                        <Text fontWeight="bold" color={'#fff'}>
+                                            OK
+                                        </Text>
+                                    </Button>
+                                </>
+                            )}
                         </Modal.Footer>
                     </Modal.Content>
                 </Modal>

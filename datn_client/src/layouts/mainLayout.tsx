@@ -24,10 +24,10 @@ const MainLayout = () => {
                     <Sider
                          breakpoint="lg"
                          collapsedWidth="0"
-                         className="flex flex-col border-solid border-[#3e3e3e] border-r-2 fixed top-0 bottom-0 left-0"
+                         className="flex flex-col border-solid border-[#f5f5f5] border-r-2 fixed top-0 bottom-0 left-0"
                          theme="light"
                     >
-                         <div className="logo !bg-white right-0  top-0 left-0 z-10  border-solid border-[#915959] border-b-2 h-20 flex justify-center items-center">
+                         <div className="logo !bg-white right-0  top-0 left-0 z-10  h-20 flex justify-center items-center">
                               <Image
                                    className="!h-20 mb-1"
                                    preview={false}
@@ -101,7 +101,7 @@ const MainLayout = () => {
                     </Sider>
                     <Layout className="sticky bottom-0 right-0">
                          <Header
-                              className="site-layout-sub-header-background !h-20 sticky top-0 z-10 !bg-[yellow] border-solid border-[#915959] border-b-2 "
+                              className="site-layout-sub-header-background !h-14 sticky top-0 z-10 !bg-[#FBC632] border-solid border-[#f5f5f5] border-b-2 "
                               style={{ padding: 0 }}
                          >
                               <HeaderComponent />

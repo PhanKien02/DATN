@@ -1,5 +1,5 @@
-import {Center, FlatList, Input, Text, VStack, View} from 'native-base';
-import {useAppSelector} from '../models/root-store/root-store';
+import {Button, Center, FlatList, Input, Text, VStack, View} from 'native-base';
+import {useAppDispatch, useAppSelector} from '../models/root-store/root-store';
 import SVGLocationIcon from '../components/icons/location';
 import MapView, {
     PROVIDER_GOOGLE,
@@ -16,7 +16,7 @@ import {
     getAddressFromLocation,
     getCurrentPosition,
     getDirections,
-    getDistance,
+    getLongDistance,
 } from '../utils/location';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
 import MapViewDirections from 'react-native-maps-directions';
@@ -25,7 +25,13 @@ import {useDebouncedEffect} from '../utils/useDebouncedEffect';
 import {
     useGetLocationFromAddressMutation,
     useSearchAddressMutation,
+    use_getBookingByIdMutation,
 } from '../services/api';
+import {FindDriverModal} from '../components/modal/findDriverModal';
+import Firebase from '../utils/firebase';
+import notifee, {AndroidImportance} from '@notifee/react-native';
+import {BOOKING} from '../models/booking-slice';
+import {InforBookingModal} from '../components/modal/inforBooking';
 interface PositionProps {
     latitude?: number;
     longitude?: number;
@@ -42,6 +48,9 @@ const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export const HomeScreen = () => {
+    const dispath = useAppDispatch();
+    const booking = useAppSelector(state => state.boooking.booking);
+    const [getBookingById, {data}] = use_getBookingByIdMutation();
     const user = useAppSelector(state => state.auth);
     const mapRef = useRef(null);
     const [distance, setDistance] = useState(0);
@@ -53,6 +62,9 @@ export const HomeScreen = () => {
     const [destinationRegion, setDestinationRegion] = useState<PositionProps>(
         {},
     );
+    const [bkId, setBkId] = useState();
+    const [openInfo, setOpenInfo] = useState(false);
+    const [showModalFindDriver, setShowModalFindDriver] = useState(false);
     const [getLocation] = useSearchAddressMutation();
     const getLiveLocation = async () => {
         const locPermissionDenied = await requestLocationPermission();
@@ -152,8 +164,60 @@ export const HomeScreen = () => {
             latitude: destinationRegion.latitude,
             longitude: destinationRegion.longitude,
         };
-        setDistance(getDistance(origin, des));
+        setDistance(getLongDistance(origin, des));
     }, [departureRegion, destinationRegion]);
+    useEffect(() => {
+        const unsubscribe = Firebase.onMessage(async dataCallBack => {
+            await notifee.deleteChannel('important');
+            // Create a channel
+            const channelId = await notifee.createChannel({
+                id: 'important',
+                name: 'Important Notifications',
+                importance: AndroidImportance.HIGH,
+                sound: 'default',
+            });
+            try {
+                // Display a notification
+                notifee.displayNotification({
+                    title: `${dataCallBack.notification.title}`,
+                    subtitle: '',
+                    body: dataCallBack.notification.body,
+                    data: dataCallBack.data,
+                    android: {
+                        channelId,
+                        color: '#FF8A00',
+                        importance: AndroidImportance.HIGH,
+                        actions: [],
+                        sound: 'default',
+                        autoCancel: false,
+                    },
+                    ios: {
+                        sound: 'local.wav',
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        });
+        notifee.onForegroundEvent(event => {
+            const id = event.detail.notification.data.bookingId.toString();
+            console.log({id, data});
+
+            if (id) {
+                getBookingById({bookingId: +id})
+                    .unwrap()
+                    .then(data => {
+                        console.log({data});
+
+                        setShowModalFindDriver(false);
+                        setOpenInfo(true);
+                        data && dispath(BOOKING(data));
+                    });
+            }
+        });
+        return unsubscribe;
+    }, []);
+    console.log({booking});
 
     return (
         <>
@@ -381,26 +445,63 @@ export const HomeScreen = () => {
                                 bottom: 0,
                             }}>
                             {departureRegion.latitude &&
-                                destinationRegion.latitude && (
-                                    <BookingModal
-                                        customerId={user?.user?.id}
-                                        originAddress={departureAddress}
-                                        originlongitude={
-                                            departureRegion.longitude
-                                        }
-                                        originLatitude={
-                                            departureRegion.latitude
-                                        }
-                                        destinationLatitude={
-                                            destinationRegion.latitude
-                                        }
-                                        destinationLongitude={
-                                            departureRegion.longitude
-                                        }
-                                        destinationAddress={destinationAddress}
-                                        distance={distance}
-                                    />
+                                destinationRegion.latitude &&
+                                !booking && (
+                                    <>
+                                        <BookingModal
+                                            setBkId={setBkId}
+                                            setShowModalFindDriver={
+                                                setShowModalFindDriver
+                                            }
+                                            customerId={user?.user?.id}
+                                            originAddress={departureAddress}
+                                            originlongitude={
+                                                departureRegion.longitude
+                                            }
+                                            originLatitude={
+                                                departureRegion.latitude
+                                            }
+                                            destinationLatitude={
+                                                destinationRegion.latitude
+                                            }
+                                            destinationLongitude={
+                                                departureRegion.longitude
+                                            }
+                                            destinationAddress={
+                                                destinationAddress
+                                            }
+                                            distance={distance}
+                                        />
+                                        <FindDriverModal
+                                            open={showModalFindDriver}
+                                            setOpen={setShowModalFindDriver}
+                                            id={bkId}
+                                        />
+                                    </>
                                 )}
+                            {booking && (
+                                <Center
+                                    style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        bottom: 0,
+                                    }}>
+                                    <Button
+                                        backgroundColor="#FBC632"
+                                        w="full"
+                                        onPress={() => setOpenInfo(true)}>
+                                        Thông Tin Đơn Hàng
+                                    </Button>
+                                </Center>
+                            )}
+                            {booking && (
+                                <InforBookingModal
+                                    open={openInfo}
+                                    setOpen={setOpenInfo}
+                                    bookingId={booking.id}
+                                    isUser={true}
+                                />
+                            )}
                         </Center>
                     </View>
                 </View>

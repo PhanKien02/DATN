@@ -50,7 +50,7 @@ const HeaderComponent = () => {
                               icon={<UserOutlined />}
                          />
                          <div className="flex gap-1 items-center">
-                              <strong>Hello</strong>
+                              <strong>Xin Chào</strong>
                               <p>{userLogin.fullName}</p>
                               <CaretDownOutlined />
                          </div>

@@ -6,6 +6,7 @@ import {
      StyleSheet,
      Font,
      PDFViewer,
+     Image,
 } from "@react-pdf/renderer";
 import { Table, TR, TH, TD } from "@ag-media/react-pdf-table";
 import robotoRegular from "/fonts/Roboto-Regular.ttf";
@@ -13,6 +14,9 @@ import robotoBold from "/fonts/Roboto-Bold.ttf";
 import { IInvoice } from "../models/invoice";
 import { formatDate } from "../utils/formatDate";
 import { useAuthContext } from "../contexts/authContext";
+import { convertNumberToWords } from "../utils/converNumberToText";
+import logo from "../assets/logo.png";
+import ck from "../assets/chu-ky.png";
 
 Font.register({
      family: "Roboto",
@@ -35,9 +39,8 @@ const styles = StyleSheet.create({
           fontFamily: "Roboto",
           fontSize: 30,
           fontWeight: "bold",
-          marginBottom: 10,
           textAlign: "center",
-          color: "#4B70F5", // Light red color
+          color: "#000", // Light red color
      },
      section: {
           marginBottom: 10,
@@ -47,7 +50,7 @@ const styles = StyleSheet.create({
           fontFamily: "Roboto",
           width: "auto",
           borderStyle: "solid",
-          borderColor: "#4B70F5",
+          borderColor: "#000",
           borderWidth: 1,
           borderRightWidth: 0,
           borderBottomWidth: 0,
@@ -60,7 +63,7 @@ const styles = StyleSheet.create({
           fontFamily: "Roboto",
           width: "25%",
           borderStyle: "solid",
-          borderColor: "#4B70F5",
+          borderColor: "#000",
           borderWidth: 1,
           borderLeftWidth: 0,
           borderTopWidth: 0,
@@ -82,7 +85,7 @@ const styles = StyleSheet.create({
           alignItems: "center",
           width: "100%",
           marginBottom: 10,
-          color: "#4B70F5", // Light red color
+          color: "#000", // Light red color
      },
 });
 
@@ -105,49 +108,73 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                <PDFViewer width="100%" height="100%">
                     <Document>
                          <Page size="A4" style={styles.page}>
-                              <Text style={styles.title}>
-                                   Hóa Đơn Bán Hàng{" "}
+                              <Image
+                                   src={logo}
+                                   style={{
+                                        width: 500,
+                                        position: "absolute",
+                                        top: "20%",
+                                        left: "7%",
+                                        opacity: 0.5,
+                                   }}
+                              />
+                              <Text style={styles.title}>Hóa Đơn Bán Hàng</Text>
+                              <Text
+                                   style={{
+                                        textAlign: "center",
+                                        fontSize: "12",
+                                   }}
+                              >
+                                   (Ngày {formatDate(new Date()).split("-")[0]}{" "}
+                                   Tháng {formatDate(new Date()).split("-")[1]}{" "}
+                                   Năm {formatDate(new Date()).split("-")[2]})
                               </Text>
                               <View style={styles.section}>
-                                   <Text style={styles.header}>
-                                        Thông Tin Đơn Hàng
-                                   </Text>
-                                   <View>
-                                        <Text>
-                                             Họ và tên khách hàng:
-                                             {data.booking.customer.fullName}
+                                   <View style={{ flexDirection: "row" }}>
+                                        <Text style={{ fontWeight: "bold" }}>
+                                             Đơn vị bán hàng:
+                                        </Text>
+                                        <Text>TAXI DELIVER</Text>
+                                   </View>
+                                   <View style={{ flexDirection: "row" }}>
+                                        <Text style={{ fontWeight: "bold" }}>
+                                             Mã số thuế:
+                                        </Text>
+                                        <Text>8794909789</Text>
+                                   </View>
+                                   <View style={{ flexDirection: "row" }}>
+                                        <Text style={{ fontWeight: "bold" }}>
+                                             Điện thoại:
+                                        </Text>
+                                        <Text>0374824666</Text>
+                                   </View>
+                                   <View style={{ flexDirection: "row" }}>
+                                        <Text style={{ fontWeight: "bold" }}>
+                                             Tài xế:
                                         </Text>
                                         <Text>
-                                             Ngày sinh:{" "}
-                                             {data.booking.customer.dob
-                                                  ? formatDate(
-                                                         data.booking.customer
-                                                              .dob
-                                                    )
-                                                  : ""}
-                                        </Text>
-                                        <Text>
-                                             Giới tính:{" "}
-                                             {data.booking.customer.gender
-                                                  ? "Nam"
-                                                  : "Nữ"}
+                                             {data.booking.driver.fullName}
                                         </Text>
                                    </View>
-                                   <Text>
-                                        Số điện thoại:{" "}
-                                        {data.booking.customer.phone || ""}
-                                   </Text>
-                                   <View>
+                                   <View style={{ flexDirection: "row" }}>
+                                        <Text style={{ fontWeight: "bold" }}>
+                                             Họ và tên khách hàng:
+                                        </Text>
                                         <Text>
-                                             Họ và tên tài xế:{" "}
-                                             {data.booking.driver.fullName}
+                                             {data.booking.customer.fullName}
+                                        </Text>
+                                   </View>
+                                   <View style={{ flexDirection: "row" }}>
+                                        <Text style={{ fontWeight: "bold" }}>
+                                             Điện thoại:
+                                        </Text>
+                                        <Text>
+                                             {data.booking.customer.phone ||
+                                                  "0367928372"}
                                         </Text>
                                    </View>
                               </View>
                               <View style={styles.section}>
-                                   <Text style={styles.header}>
-                                        Chi Tiết Hóa Đơn
-                                   </Text>
                                    <Table tdStyle={{ padding: "2px" }}>
                                         <TH style={{ fontSize: 14 }}>
                                              <TD
@@ -221,7 +248,8 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                                   style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   {
@@ -233,7 +261,8 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                                   style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   {data.booking.longDistance}
@@ -242,7 +271,8 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                                   style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   {
@@ -254,7 +284,8 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                                   style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   {data.booking.promotion
@@ -266,7 +297,8 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                                   style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   {" "}
@@ -276,9 +308,60 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                         <TR>
                                              <TD
                                                   style={{
+                                                       height: 40,
+                                                  }}
+                                             ></TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                        </TR>
+                                        <TR>
+                                             <TD
+                                                  style={{
+                                                       height: 40,
+                                                  }}
+                                             ></TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD></TD>
+                                        </TR>
+                                        <TR>
+                                             <TD
+                                                  style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
+                                                  }}
+                                             >
+                                                  Tiền thuế
+                                             </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD> </TD>
+                                             <TD
+                                                  style={{
+                                                       display: "flex",
+                                                       flexDirection: "row",
+                                                       justifyContent:
+                                                            "flex-end",
+                                                  }}
+                                             >
+                                                  0
+                                             </TD>
+                                        </TR>
+                                        <TR>
+                                             <TD
+                                                  style={{
+                                                       display: "flex",
+                                                       flexDirection: "row",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   Tổng Tiền
@@ -291,7 +374,8 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                                   style={{
                                                        display: "flex",
                                                        flexDirection: "row",
-                                                       justifyContent: "center",
+                                                       justifyContent:
+                                                            "flex-end",
                                                   }}
                                              >
                                                   {" "}
@@ -299,14 +383,59 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                              </TD>
                                         </TR>
                                    </Table>
+                                   <View
+                                        style={{
+                                             flexDirection: "row",
+                                             marginTop: 10,
+                                        }}
+                                   >
+                                        <Text
+                                             style={{
+                                                  fontWeight: "bold",
+                                             }}
+                                        >
+                                             Số tiền bằng chữ:{" "}
+                                        </Text>
+                                        <Text>
+                                             {convertNumberToWords(
+                                                  data.totalCost
+                                             )}{" "}
+                                        </Text>
+                                   </View>
                               </View>
                               <View
                                    style={{
                                         flexDirection: "row",
-                                        justifyContent: "flex-end",
-                                        marginTop: 80,
+                                        justifyContent: "space-between",
+                                        marginTop: 10,
+                                        marginLeft: 40,
                                    }}
                               >
+                                   <View
+                                        style={{
+                                             flexDirection: "column",
+                                             alignItems: "center",
+                                             marginTop: 20,
+                                        }}
+                                   >
+                                        <Text
+                                             style={{
+                                                  marginTop: 20,
+                                                  fontWeight: "bold",
+                                             }}
+                                        >
+                                             Người Mua Hàng
+                                        </Text>
+                                        <Text>(Ký ghi rõ họ tên)</Text>
+                                        <Text
+                                             style={{
+                                                  fontWeight: "bold",
+                                                  marginTop: 94,
+                                             }}
+                                        >
+                                             {data.booking.customer.fullName}
+                                        </Text>
+                                   </View>
                                    <View
                                         style={{
                                              flexDirection: "column",
@@ -329,14 +458,22 @@ const ExportInvoice = ({ data }: { data: IInvoice }) => {
                                              Người Xuất Hóa Đơn
                                         </Text>
                                         <Text>(Ký ghi rõ họ tên)</Text>
-                                        <Text
-                                             style={{
-                                                  fontWeight: "bold",
-                                                  marginTop: 70,
-                                             }}
-                                        >
-                                             {userLogin?.fullName}
-                                        </Text>
+                                        <>
+                                             <Image
+                                                  src={ck}
+                                                  style={{
+                                                       width: 160,
+                                                  }}
+                                             />
+                                             <Text
+                                                  style={{
+                                                       fontWeight: "bold",
+                                                  }}
+                                             >
+                                                  {userLogin &&
+                                                       userLogin.fullName}
+                                             </Text>
+                                        </>
                                    </View>
                               </View>
                          </Page>
