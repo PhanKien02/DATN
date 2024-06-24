@@ -9,6 +9,7 @@ import {
     completeBooking,
     getAllbooking,
     getBookingById,
+    rateBooking,
     rejectBooking,
     startMoving,
 } from "../controllers/booking.controller";
@@ -35,6 +36,7 @@ class BookingRouter extends BaseRouter {
         this.router.put("/accept", catchAsync(acceptBooking));
         this.router.put("/moving", catchAsync(startMoving));
         this.router.put("/complete", catchAsync(completeBooking));
+        this.router.put("/rate", catchAsync(rateBooking));
     }
 }
 

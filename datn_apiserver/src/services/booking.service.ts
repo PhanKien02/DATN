@@ -21,6 +21,7 @@ class BookingService {
         const newBooking = await bookingRepository.create({
             ...booking,
             statused: BookingStatus.FIND_DRIVER,
+            paymentStatus: false,
             date: new Date(),
         });
         const admins = await userRepository.findAll({
@@ -377,6 +378,22 @@ class BookingService {
                 }
             ),
         ]);
+    }
+    async ratingBooking(bkId: number, rate: number) {
+        const bk = await bookingRepository.findByPk(bkId);
+        console.log({ bkId, rate });
+        if (!bk) throw new BadRequestError("Chuyến Đi Không Tồn Tại");
+        if (bk.dataValues.statused != BookingStatus.COMPLETE)
+            throw new BadRequestError("Chuyến Đi Chưa Hoàn Thành");
+
+        return await bookingRepository.update(
+            { rate: rate },
+            {
+                where: {
+                    id: bkId,
+                },
+            }
+        );
     }
 }
 export default new BookingService();

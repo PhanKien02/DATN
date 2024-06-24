@@ -5,7 +5,6 @@ import MapView, {
     PROVIDER_GOOGLE,
     Marker,
     AnimatedRegion,
-    Polyline,
 } from 'react-native-maps';
 import {Alert, Dimensions, StyleSheet} from 'react-native';
 import {useEffect, useRef, useState} from 'react';
@@ -15,7 +14,6 @@ import {
     Location,
     getAddressFromLocation,
     getCurrentPosition,
-    getDirections,
     getLongDistance,
 } from '../utils/location';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
@@ -23,7 +21,6 @@ import MapViewDirections from 'react-native-maps-directions';
 import {BookingModal} from '../components/modal/bookingModal';
 import {useDebouncedEffect} from '../utils/useDebouncedEffect';
 import {
-    useGetLocationFromAddressMutation,
     useSearchAddressMutation,
     use_getBookingByIdMutation,
 } from '../services/api';
@@ -129,6 +126,8 @@ export const HomeScreen = () => {
         [destinationAddress],
         500,
     );
+    console.log({departureRegion, destinationRegion, distance});
+
     useEffect(() => {
         if (mapRef.current) {
             mapRef.current.fitToCoordinates(
@@ -201,14 +200,10 @@ export const HomeScreen = () => {
         });
         notifee.onForegroundEvent(event => {
             const id = event.detail.notification.data.bookingId.toString();
-            console.log({id, data});
-
             if (id) {
                 getBookingById({bookingId: +id})
                     .unwrap()
                     .then(data => {
-                        console.log({data});
-
                         setShowModalFindDriver(false);
                         setOpenInfo(true);
                         data && dispath(BOOKING(data));
@@ -217,7 +212,6 @@ export const HomeScreen = () => {
         });
         return unsubscribe;
     }, []);
-    console.log({booking});
 
     return (
         <>

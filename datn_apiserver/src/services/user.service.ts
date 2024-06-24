@@ -285,9 +285,9 @@ class userService {
                         long: {
                             [Op.between]: [long - 0.00872, long + 0.00872],
                         },
-                        time: {
-                            [Op.gte]: later,
-                        },
+                        // time: {
+                        //     [Op.gte]: later,
+                        // },
                     },
                 },
                 {

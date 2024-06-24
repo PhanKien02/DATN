@@ -47,7 +47,6 @@ export const BookingModal = ({
     setShowModalFindDriver,
     setBkId,
 }: Props) => {
-    const dispath = useAppDispatch();
     const [showModal, setShowModal] = useState(false);
     const [booking, {error, isLoading}] = useBookingMutation();
 

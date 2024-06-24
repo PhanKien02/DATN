@@ -90,3 +90,9 @@ export const completeBooking = async (
     );
     return res.status(httpStatus.OK).send(response);
 };
+
+export const rateBooking = async (req: AuthenticatedRequest, res: Response) => {
+    const { bookingId, rate } = req.body;
+    const response = await bookingService.ratingBooking(bookingId, rate);
+    return res.status(httpStatus.OK).send(response);
+};

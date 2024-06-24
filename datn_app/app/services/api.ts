@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import {API_GG_MAP_KEY} from '../constants/keyAPIGoogleMap';
-const url = 'https://8445-14-236-44-238.ngrok-free.app/api/';
+const url = 'https://965f-116-110-225-120.ngrok-free.app/api/';
 export const api = createApi({
     // Tương tự tên Slice khi tạo Slice thông thường
     reducerPath: 'api',
@@ -173,6 +173,13 @@ export const api = createApi({
                 method: 'PUT',
             }),
         }),
+        rateBooking: builder.mutation({
+            query: ({bookingId, rate}) => ({
+                url: `${url}booking/rate`,
+                body: {bookingId, rate},
+                method: 'PUT',
+            }),
+        }),
     }),
 });
 export const {
@@ -197,4 +204,5 @@ export const {
     use_getBookingByIdMutation,
     useGetProfileQuery,
     useUpdateProfileMutation,
+    useRateBookingMutation,
 } = api;

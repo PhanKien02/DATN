@@ -15,6 +15,8 @@ const AssignDriverModal = ({ refetch, data, open, setOpen }: Props) => {
           data.originLatitude,
           data.originlongitude
      );
+     console.log({ drivers, data });
+
      const [driver, setDriver] = useState<number | null>(null);
      console.log(drivers);
 
@@ -36,7 +38,7 @@ const AssignDriverModal = ({ refetch, data, open, setOpen }: Props) => {
                     .then(() => {
                          toast.success("Đã Giao Tài Xế");
                          setOpen(false);
-                         refetch(       );
+                         refetch();
                     })
                     .catch(() => toast.error("Giao Tài Xế Thất Bại"));
           }
@@ -94,6 +96,7 @@ const AssignDriverModal = ({ refetch, data, open, setOpen }: Props) => {
                               </p>
                          </div>
                     </div>
+                    <strong className="w-24">Tài Xế</strong>
                     <Select className="w-full" onChange={setDriver}>
                          {drivers?.map((drv) => (
                               <Select.Option value={drv.id}>

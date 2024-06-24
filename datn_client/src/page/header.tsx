@@ -45,7 +45,7 @@ const HeaderComponent = () => {
                <Dropdown menu={{ items }} className="mr-4">
                     <div className="flex justify-end items-center gap-3">
                          <Avatar
-                              src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg"
+                              src="https://firebasestorage.googleapis.com/v0/b/datn-44ee0.appspot.com/o/user_icon_img.png?alt=media&token=33f924fd-3bcf-4635-8eba-a612f4d86f16"
                               size="large"
                               icon={<UserOutlined />}
                          />

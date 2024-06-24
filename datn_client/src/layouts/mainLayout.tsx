@@ -27,11 +27,14 @@ const MainLayout = () => {
                          className="flex flex-col border-solid border-[#f5f5f5] border-r-2 fixed top-0 bottom-0 left-0"
                          theme="light"
                     >
-                         <div className="logo !bg-white right-0  top-0 left-0 z-10  h-20 flex justify-center items-center">
+                         <div className="logo !bg-white right-0  top-0 left-0 z-10 flex justify-center items-center">
                               <Image
-                                   className="!h-20 mb-1"
                                    preview={false}
                                    src="../public/logo.png"
+                                   width={200}
+                                   style={{
+                                        marginTop: "50px",
+                                   }}
                               />
                          </div>
                          <Menu
@@ -41,7 +44,7 @@ const MainLayout = () => {
                               style={{
                                    backgroundColor: "#",
                                    boxSizing: "border-box",
-                                   marginTop: "20px",
+                                   marginTop: "50px",
                               }}
                          >
                               <div className=" flex items-start justify-start flex-col gap-4  ml-5">
@@ -79,7 +82,7 @@ const MainLayout = () => {
                                              return (
                                                   <NavLink
                                                        to={menu.link ?? ""}
-                                                       className="flex justify-start items-center gap-3 "
+                                                       className="flex justify-start items-center gap-3 mt-6 text-lg "
                                                        key={menu.id}
                                                   >
                                                        {menu.icon ? (

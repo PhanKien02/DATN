@@ -1,9 +1,10 @@
-import {Button, Modal, Text, View} from 'native-base';
+import {Button, Center, Modal, Text, View} from 'native-base';
 
 import {Loading} from '../Loading';
 import {
     useCompleteMovingMutation,
     useGetBookingByIdQuery,
+    useRateBookingMutation,
     useStartMoingMutation,
 } from '../../services/api';
 import Toast from 'react-native-toast-message';
@@ -14,8 +15,7 @@ import Firebase from '../../utils/firebase';
 import {BookingStatus} from '../../constants/booking';
 import {useAppDispatch} from '../../models/root-store/root-store';
 import {BOOKING} from '../../models/booking-slice';
-import {Rating, AirbnbRating} from 'react-native-ratings';
-const WATER_IMAGE = require('./water.png');
+import {AirbnbRating} from 'react-native-ratings';
 interface Props {
     bookingId: number;
     idDriver?: number;
@@ -33,10 +33,14 @@ export const InforBookingModal = ({
 }: Props) => {
     const dispath = useAppDispatch();
     const [booking, setBooking] = useState<IBooking | null>(null);
-    const [startMoving] = useStartMoingMutation();
-    const [completeBooking] = useCompleteMovingMutation();
+    const [startMoving, {isLoading: isLoadingStart}] = useStartMoingMutation();
+    const [completeBooking, {isLoading: isLoadingComplete}] =
+        useCompleteMovingMutation();
     const {data, refetch, isLoading} = useGetBookingByIdQuery({bookingId});
+    const [ratingBooking] = useRateBookingMutation();
     const [photoPath, setPhotoPath] = useState<{uri: string}[]>([]);
+    const [rating, setRating] = useState(0);
+    const [errMessase, setErrMessage] = useState('');
     useEffect(() => {
         refetch();
     }, [bookingId]);
@@ -67,6 +71,23 @@ export const InforBookingModal = ({
             }
         }
     };
+    const CustomerAction = () => {
+        ratingBooking({bookingId, rate: rating})
+            .unwrap()
+            .then(() => {
+                setOpen(false);
+                dispath(BOOKING(null));
+                Toast.show({
+                    type: 'success',
+                    text1: 'Hoàn Thành Chuyến Đi',
+                });
+            })
+            .catch(err => {
+                console.log({err});
+                setErrMessage(err.data.message);
+            });
+    };
+
     return (
         <>
             <>
@@ -197,16 +218,32 @@ export const InforBookingModal = ({
                                             setPhotoPath={setPhotoPath}
                                         />
                                     ) : (
-                                        <>
-                                            <Rating
-                                                type="heart"
-                                                ratingCount={3}
-                                                imageSize={60}
-                                                showRating
+                                        <View>
+                                            <AirbnbRating
+                                                count={5}
+                                                ratingContainerStyle={{
+                                                    padding: 5,
+                                                }}
+                                                onFinishRating={setRating}
+                                                defaultRating={0}
+                                                showRating={false}
+                                                reviews={[
+                                                    'Terrible',
+                                                    'Bad',
+                                                    'Meh',
+                                                    'OK',
+                                                    'Good',
+                                                ]}
+                                                size={45}
                                             />
-                                        </>
+                                        </View>
                                     )}
                                 </View>
+                            )}
+                            {errMessase && (
+                                <Center>
+                                    <Text color={'#F43'}>{errMessase}</Text>
+                                </Center>
                             )}
                         </Modal.Body>
                         <Modal.Footer>
@@ -216,12 +253,17 @@ export const InforBookingModal = ({
                                     borderRadius={10}
                                     colorScheme="green"
                                     onPress={DriverAction}>
-                                    <Text fontWeight="bold" color={'#fff'}>
-                                        {booking &&
-                                        booking.statused != BookingStatus.MOVING
-                                            ? 'Bắt Đầu Di Chuyển'
-                                            : 'Thanh Toán Và Hoàn Thành Chuyến Đi'}
-                                    </Text>
+                                    {isLoadingStart || isLoadingComplete ? (
+                                        <Loading />
+                                    ) : (
+                                        <Text fontWeight="bold" color={'#fff'}>
+                                            {booking &&
+                                            booking.statused !=
+                                                BookingStatus.MOVING
+                                                ? 'Bắt Đầu Di Chuyển'
+                                                : 'Thanh Toán Và Hoàn Thành Chuyến Đi'}
+                                        </Text>
+                                    )}
                                 </Button>
                             ) : (
                                 <>
@@ -229,7 +271,7 @@ export const InforBookingModal = ({
                                         w="full"
                                         borderRadius={10}
                                         colorScheme="green"
-                                        onPress={DriverAction}>
+                                        onPress={CustomerAction}>
                                         <Text fontWeight="bold" color={'#fff'}>
                                             OK
                                         </Text>
